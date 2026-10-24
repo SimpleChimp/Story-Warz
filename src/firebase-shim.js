@@ -1,6 +1,8 @@
 // Stand-in for the claude.ai runtime (db + user), backed by Firestore.
 // Every game lives under rooms/<CODE>/. The device that creates a room is its host.
-// Each browser tab is its own player: anonymous auth is kept in sessionStorage.
+// Each browser is one player: anonymous auth is kept in localStorage, so a phone that reopens the
+// link (new tab, QR scanned again, tab discarded by the OS) keeps its seat, and the host keeps host.
+// Add &tab to the URL to make each tab its own player (for testing several players on one computer).
 (function () {
   const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ";   // no I/O, easy to read out loud
   const rid = () => Math.random().toString(36).slice(2, 10);
@@ -78,7 +80,8 @@
 
   let ROOM = null;
   const ready = (async () => {
-    await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+    const perTab = new URLSearchParams(location.search).has("tab");
+    await auth.setPersistence(perTab ? firebase.auth.Auth.Persistence.SESSION : firebase.auth.Auth.Persistence.LOCAL);
     if (!auth.currentUser) await new Promise(r => { const off = auth.onAuthStateChanged(() => { off(); r(); }); });
     if (!auth.currentUser) await auth.signInAnonymously();
     const uid = auth.currentUser.uid;

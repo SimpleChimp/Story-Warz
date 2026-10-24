@@ -645,7 +645,10 @@ function errMsg(e){
 async function act(fn){
   if (S.busy) return;
   S.busy = true; render();
-  try { await fn(); } catch (e) { toast(errMsg(e)); }
+  // Never leave the buttons locked: a write that hangs (phone asleep, bad signal) gives up after 15 s.
+  // It may still land later; transition() keeps a late write from moving the game twice.
+  const slow = new Promise((_, no) => setTimeout(() => no({ code: "unavailable" }), 15000));
+  try { await Promise.race([fn(), slow]); } catch (e) { toast(errMsg(e)); }
   finally { S.busy = false; render(); }
 }
 
@@ -994,7 +997,11 @@ function pickScreenHTML(g){
     body = `<p class="eyebrow">${tb ? `Tie breaker: ${who.map(p => esc(nameOf(p))).join(" vs ")}` : "Picks so far"}</p>
       <div class="quad">${g.players.map(p => `<div class="g opt ro"><span class="tn">${esc(nameOf(p))}</span>${tags(p)}</div>`).join("")}</div>`;
   }
-  if (waiting.length) body += `<p class="fine">Still choosing: ${waiting.map(p => esc(nameOf(p))).join(", ")}</p>`;
+  if (waiting.length){
+    body += `<p class="fine">Still choosing: ${waiting.map(p => esc(nameOf(p))).join(", ")}</p>`;
+    // A player who dropped out (phone died, left) would otherwise block the round forever.
+    if (S.isHost) body += `<button class="g btn" data-act="forceReveal" ${S.busy ? "disabled" : ""}>Reveal without ${waiting.length === 1 ? esc(nameOf(waiting[0])) : "them"}</button>`;
+  }
   else if (S.isHost) body += `<p class="fine">Everyone's locked in.</p><button class="g primary" data-act="reveal" ${S.busy ? "disabled" : ""}>Reveal the author</button>`;
   else body += `<p class="fine">Everyone's locked in. Waiting for the host to reveal.</p>`;
   return storyCardHTML(g, false) + `<section class="card">${body}</section>`;
@@ -1097,6 +1104,7 @@ document.addEventListener("click", e => {
     case "do-cancel": case "do-end": S.confirm = null; S.settings = false; return act(() => S.db.doc("game/state").set({ phase: null }));
     case "retryReveal": S.revealFailed = false; return act(doReveal);
     case "reveal": if (!S.isHost || !g || !allLocked(g)) return; return act(doReveal);
+    case "forceReveal": if (!S.isHost || !g || !["guess", "tiebreak"].includes(g.phase)) return; return act(doReveal);
   }
   render();
 });
