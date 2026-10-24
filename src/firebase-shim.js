@@ -79,8 +79,8 @@
   }
 
   let ROOM = null;
+  const perTab = new URLSearchParams(location.search).has("tab");
   const ready = (async () => {
-    const perTab = new URLSearchParams(location.search).has("tab");
     await auth.setPersistence(perTab ? firebase.auth.Auth.Persistence.SESSION : firebase.auth.Auth.Persistence.LOCAL);
     if (!auth.currentUser) await new Promise(r => { const off = auth.onAuthStateChanged(() => { off(); r(); }); });
     if (!auth.currentUser) await auth.signInAnonymously();
@@ -93,7 +93,7 @@
       code = r.code;
       room = await fs.doc("rooms/" + code).get();
       r.box.remove();
-      history.replaceState(null, "", pageLink("?room=" + code));
+      history.replaceState(null, "", pageLink("?room=" + code + (perTab ? "&tab" : "")));
     }
     ROOM = code;
     window.claudeRoom = code;
