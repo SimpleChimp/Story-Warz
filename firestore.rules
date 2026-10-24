@@ -1,0 +1,27 @@
+rules_version = '2';
+// Story Warz: every game is rooms/<CODE>. The creator is the host and the referee.
+// Mirrors the local server: players write only seats/<uid>, stories/<uid> (and votes/<uid>);
+// game/*, secret/* and lease/* are host-only; others' stories and the deck are unreadable.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rooms/{room} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['host', 'created'])
+        && request.resource.data.host == request.auth.uid;
+
+      function isHost() {
+        return get(/databases/$(database)/documents/rooms/$(room)).data.host == request.auth.uid;
+      }
+      function isPrivate(coll) { return coll in ['secret', 'stories', 'votes']; }
+      function ownDoc(coll, doc) { return coll in ['seats', 'stories', 'votes'] && doc == request.auth.uid; }
+
+      match /{coll}/{doc} {
+        allow read: if request.auth != null
+          && (!isPrivate(coll) || (coll != 'secret' && doc == request.auth.uid) || isHost());
+        allow write: if request.auth != null
+          && (ownDoc(coll, doc) || isHost());
+      }
+    }
+  }
+}

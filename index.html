@@ -1,0 +1,1164 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Story Warz</title>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-shim.js"></script>
+</head><body>
+<title>Story Warz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Black+Ops+One&family=Stardos+Stencil:wght@400;700&family=Permanent+Marker&family=Press+Start+2P&family=VT323&family=Playfair+Display:ital,wght@0,900;1,900&family=Sedgwick+Ave+Display&family=Special+Elite&family=UnifrakturMaguntia&display=swap">
+<style>
+/* Layout: one phone-width column, a photocopied punk zine on black. Typewriter body, cut-out magazine lettering, spray-painted jagged buttons; the story is a taped-up typed page. Single deliberate dark look. */
+:root{
+  --bg:#0a0a0a; --bg-2:#141313; --line:#2e2a2a;
+  --paper:#f2eee5; --news:#e6e0d2; --white:#ffffff; --ink:#0a0a0a;
+  --red:#e1262d; --red-hot:#ff4040; --red-deep:#8c1116;
+  --mute:#9a948e;
+  --glitch:#2ee6ff;
+  --f-display:"Anton","Impact","Arial Narrow Bold",sans-serif;
+  --f-type:"Special Elite","Courier New",Courier,monospace;
+  --f-spray:"Sedgwick Ave Display","Permanent Marker","Comic Sans MS",cursive;
+  --f-marker:"Permanent Marker","Comic Sans MS",cursive;
+  color-scheme:dark;
+}
+html,body{min-height:100%;overflow-x:hidden}
+body{background-color:var(--bg);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");color:var(--white);font:16px/1.55 var(--f-type)}
+.wrap{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:12px 64px;display:flex;flex-direction:column;gap:22px}
+h1,h2{font-family:var(--f-display);font-weight:400;line-height:1.02;margin:0;text-wrap:balance;text-transform:uppercase;letter-spacing:.01em}
+h1{font-size:2rem} h2{font-size:1.5rem}
+p{margin:0}
+.eyebrow{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--red-hot)}
+.fine{font-size:.875rem;color:var(--mute)}
+
+/* typewriter: vowels strike a little off the line */
+.v{display:inline-block}
+.w{white-space:nowrap}
+.v0{transform:translateY(-.09em) rotate(-3deg)}
+.v1{transform:translateY(.08em) rotate(2.5deg)}
+.v2{transform:translateY(-.05em);opacity:.7}
+.v3{transform:translateY(.12em) rotate(-1.5deg)}
+
+/* ransom note: letters cut from different papers */
+.ransom{display:flex;flex-wrap:wrap;gap:5px 3px;align-items:center;line-height:1}
+.rn{display:inline-block;padding:.08em .13em .03em;line-height:1}
+.rn.r0{background:var(--news) radial-gradient(circle,rgba(0,0,0,.2) 1px,transparent 1.3px) 0 0/4px 4px;color:#111;font-family:"Playfair Display",Georgia,serif;font-weight:900}
+.rn.r1{background:var(--red);color:var(--white);font-family:"Abril Fatface",Georgia,serif}
+.rn.r2{background:#000;color:var(--white);font-family:var(--f-display);box-shadow:inset 0 0 0 2px var(--white)}
+.rn.r3{background:var(--white);color:var(--red);font-family:"UnifrakturMaguntia","Old English Text MT",serif}
+.rn.r4{background:#d6cfbf radial-gradient(circle,rgba(0,0,0,.16) 1px,transparent 1.2px) 0 0/3px 3px;color:#000;font-family:var(--f-type);text-transform:lowercase}
+.rn.r5{background:var(--white);color:#000;font-family:"Abril Fatface",Georgia,serif;box-shadow:inset 0 -.16em 0 var(--red)}
+.rn.r6{background:#b81d23 radial-gradient(circle,rgba(0,0,0,.35) 1px,transparent 1.4px) 0 0/5px 5px;color:#000;font-family:var(--f-display)}
+.rn.r7{background:#151515;color:var(--paper);font-family:"Playfair Display",Georgia,serif;font-style:italic;font-weight:900}
+.rn.c0{clip-path:polygon(3% 6%,97% 0,100% 94%,0 100%)}
+.rn.c1{clip-path:polygon(0 0,100% 5%,95% 100%,5% 95%)}
+.rn.c2{clip-path:polygon(7% 0,100% 0,93% 92%,0 100%)}
+.rn.c3{clip-path:polygon(0 9%,92% 0,100% 100%,8% 93%)}
+.rn.s1{font-size:1.18em} .rn.s2{font-size:.86em}
+.rn.t0{transform:rotate(-4deg)} .rn.t1{transform:rotate(3deg) translateY(3px)} .rn.t2{transform:rotate(-1deg) translateY(-3px)} .rn.t3{transform:rotate(6deg)} .rn.t4{transform:rotate(-7deg) translateY(2px)}
+.sp{width:.35em}
+.ransom{gap:8px 14px}
+.rw{display:inline-flex;gap:3px;align-items:center;white-space:nowrap}
+.hero{display:flex;flex-direction:column;gap:16px;padding-block:8px}
+.hero .ransom{font-size:clamp(2.1rem,11.5vw,3rem)}
+.hero .tag-line{font-size:1.1rem;color:var(--paper)}
+
+/* spray-painted graffiti, Spider-Verse style: faint halftone, misregistered print layer, soft overspray */
+button{font:inherit;cursor:pointer;color:var(--white);background:none;border:0;border-radius:0}
+button:disabled{cursor:not-allowed;opacity:.4}
+button:focus-visible,input[type=checkbox]:focus-visible{outline:3px dashed var(--red-hot);outline-offset:4px}
+.g{position:relative;isolation:isolate;--off:5px;--in:0px;--fill:var(--red);--sh:var(--white);--glow:rgba(255,64,64,.5);--cut:polygon(0 14%,8% 0,47% 7%,100% 0,97% 48%,100% 100%,62% 90%,3% 100%);filter:drop-shadow(0 0 8px var(--glow))}
+.g::before,.g::after{content:"";position:absolute;inset:0;z-index:-1;clip-path:var(--cut)}
+.g::before{background:radial-gradient(circle,rgba(46,230,255,.45) 0 1px,transparent 1.4px) 0 0/6px 6px,var(--sh);transform:translate(var(--off),var(--off))}
+.g::after{background:radial-gradient(circle,rgba(0,0,0,.12) 0 .9px,transparent 1.3px) 0 0/7px 7px,radial-gradient(ellipse at 22% 18%,rgba(255,255,255,.35),transparent 58%),var(--fill);inset:var(--in)}
+.g:active:not(:disabled){transform:translate(3px,3px)}
+.primary{font-family:var(--f-spray);font-size:1.75rem;line-height:1.1;padding:14px 22px 12px;text-shadow:-2px -1px 0 var(--glitch),3px 3px 0 var(--ink)}
+.btn{--off:3px;--sh:var(--red);--fill:var(--white);--glow:rgba(255,255,255,.28);color:var(--ink);font-family:var(--f-marker);font-size:.95rem;padding:10px 18px}
+.btn:hover:not(:disabled){--fill:var(--red);--sh:var(--white);--glow:rgba(255,64,64,.5);color:var(--white)}
+.btn.danger{--fill:var(--red);--sh:var(--white);--glow:rgba(255,64,64,.5);color:var(--white)}
+.btn.danger:hover:not(:disabled){--fill:var(--white);--sh:var(--red);color:var(--red)}
+.btn.sm{font-size:.8rem;padding:6px 12px}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.seg button{--off:0px;--in:2px;--fill:#000;--glow:transparent;font-family:var(--f-spray);font-size:2rem;padding:6px 0 2px}
+.seg button:nth-child(2){--cut:polygon(5% 0,100% 8%,94% 100%,0 90%)}
+.seg.looks{grid-template-columns:repeat(2,1fr)}
+.seg.looks button{font-size:1.05rem;line-height:1.15;padding:10px 4px}
+.seg button:nth-child(3){--cut:polygon(0 6%,95% 0,100% 92%,7% 100%)}
+.seg button[aria-pressed=true]{--off:5px;--in:0px;--fill:var(--red);--glow:rgba(255,64,64,.5)}
+.quad{display:flex;flex-direction:column;gap:14px}
+.opt{--off:0px;--in:2px;--fill:#000;--glow:transparent;--cut:polygon(0 10%,6% 0,50% 6%,100% 0,99% 55%,100% 100%,60% 92%,1% 100%);display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;min-height:58px;padding:12px 18px;text-align:left;overflow-wrap:break-word;hyphens:manual}
+.opt .tn{flex:1 1 auto;min-width:0;font-family:var(--f-spray);font-size:1.35rem;line-height:1.1;text-shadow:-2px -1px 0 var(--glitch),2px 2px 0 var(--red-deep)}
+.opt.ro{cursor:default}
+.opt.ro.self{cursor:not-allowed}
+/* your own name: dark, greyed, struck through; every look. Tags of who picked you stay bright. */
+.opt.self::before,.opt.self::after{filter:grayscale(1) brightness(.32) contrast(.9)!important;opacity:1!important}
+.opt.self .tn,.opt.self .yp{color:#8a8a8a!important;text-shadow:none!important;opacity:1!important}
+.opt.self .tn{text-decoration:line-through 3px;text-decoration-color:rgba(138,138,138,.85)}
+.opt.self .tn::before{content:"⊘ "!important;display:inline!important;background:none!important;-webkit-mask:none!important;mask:none!important;width:auto!important;height:auto!important}
+.opt.self .yp{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;border:2px solid #6a6a6a;padding:1px 6px}
+.opt.mine{--off:5px;--in:0px;--fill:var(--red);--glow:rgba(255,64,64,.5)}
+.yp{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase}
+.voters{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+.vt{font-size:.72rem;line-height:1.25;padding:2px 6px;background:var(--white);color:var(--ink);transform:rotate(-2deg)}
+.vt:nth-child(2n){background:var(--paper);transform:rotate(2deg)}
+.opt:nth-child(2){--cut:polygon(2% 0,100% 10%,98% 100%,0 88%)}
+.opt:nth-child(3){--cut:polygon(0 8%,97% 0,100% 90%,2% 100%)}
+.opt:nth-child(4){--cut:polygon(3% 0,100% 0,97% 100%,0 92%)}
+.opt:nth-child(5){--cut:polygon(0 0,98% 10%,100% 100%,2% 94%)}
+.opt[aria-pressed=true]{--off:5px;--in:0px;--fill:var(--red);--glow:rgba(255,64,64,.5)}
+.link{font-family:var(--f-marker);color:var(--red-hot);font-size:.85rem;padding:2px 4px}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.top .ransom{font-size:1.3rem}
+.pills{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border:2px solid var(--white);font-variant-numeric:tabular-nums}
+.pill.hot{background:var(--red);border-color:var(--red)}
+.pill.inv{background:var(--white);color:var(--ink)}
+
+/* round pips: 4 regular rounds, 4 double */
+.pips{display:flex;gap:6px;padding-inline:4px}
+.pip{flex:1;height:10px;transform:skewX(-20deg);border:2px solid var(--line)}
+.pip.dbl{border-color:var(--red-deep)}
+.pip.done{background:var(--white);border-color:var(--white)}
+.pip.dbl.done{background:var(--red);border-color:var(--red)}
+.pip.now{border-color:var(--red-hot);background:repeating-linear-gradient(90deg,var(--red-hot) 0 3px,transparent 3px 6px)}
+
+/* cards */
+.card{background:var(--bg-2);border:2px solid var(--white);box-shadow:6px 6px 0 var(--red);padding:18px;display:flex;flex-direction:column;gap:14px}
+.card.settings{border-style:dashed;box-shadow:6px 6px 0 var(--white)}
+label,.lbl{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+input[type=text],textarea{width:100%;box-sizing:border-box;font:inherit;color:var(--white);background:#000;border:2px solid var(--mute);border-radius:0;padding:10px 12px}
+textarea{resize:vertical;min-height:100px;line-height:1.45}
+input::placeholder,textarea::placeholder{color:#6f6a66}
+input:focus,textarea:focus{border-color:var(--red-hot);outline:none}
+.row{display:flex;gap:10px;align-items:stretch}
+.row>input{flex:1;min-width:0}
+.check{display:flex;gap:10px;align-items:center;text-transform:none;letter-spacing:0;font-size:1rem}
+.check input{width:20px;height:20px;accent-color:var(--red)}
+.story-in{display:flex;flex-direction:column;gap:6px}
+.story-in .lab{display:flex;justify-content:space-between;align-items:center}
+.peek{padding:12px 14px;border:2px solid var(--red);background:#000}
+.peek strong{font-family:var(--f-display);font-weight:400;font-size:1.6rem;text-transform:uppercase;color:var(--red-hot);overflow-wrap:break-word;hyphens:manual}
+.invite{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.invite img{width:168px;height:168px;flex:none;background:#fff;padding:6px;border-radius:4px;image-rendering:pixelated}
+.invite p{flex:1;min-width:150px;margin:0;overflow-wrap:anywhere}
+
+/* topic banner */
+.topic{display:flex;flex-direction:column;gap:10px;padding-block:4px}
+.topic h1{font-size:2.4rem}
+.topic h1 span{background:linear-gradient(transparent 58%,var(--red) 58%,var(--red) 92%,transparent 92%);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding-inline:2px}
+.topic p:last-child{color:var(--paper)}
+
+/* lists */
+.list{display:flex;flex-direction:column}
+.li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:2px dashed var(--line);min-width:0}
+.li:last-child{border-bottom:0}
+.li .nm{flex:1;min-width:0;font-family:var(--f-display);font-size:1.15rem;text-transform:uppercase;letter-spacing:.03em;overflow-wrap:break-word;hyphens:manual}
+.li .nm small{display:block;font-family:var(--f-type);text-transform:none;letter-spacing:0;color:var(--mute);font-size:.85rem}
+.li .nm .you{display:inline;color:var(--red-hot);font-size:.8rem;letter-spacing:.1em}
+.tag{flex:none;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border:2px solid var(--mute);color:var(--mute)}
+.tag.ok{background:var(--white);border-color:var(--white);color:var(--ink)}
+.tag.no{background:var(--red);border-color:var(--red);color:var(--white)}
+.li .x{color:var(--mute);font-size:1.3rem;padding:2px 8px}
+.li .x:hover{color:var(--red-hot)}
+.li.empty .nm{color:#5f5a56;font-family:var(--f-type);text-transform:none;font-size:1rem}
+
+/* scoreboard: each row is a spray-painted tile like the buttons; the leader gets the red paint */
+.card.board{background:none;border:0;box-shadow:none;padding:0;gap:16px;margin-top:14px}
+.board .list,.fboard{gap:14px}
+.board .li,.fboard .li{--off:0px;--in:2px;--fill:#000;--glow:transparent;border:0;padding:12px 16px}
+.board .li:nth-child(2),.fboard .li:nth-child(2){--cut:polygon(2% 0,100% 8%,98% 100%,0 90%)}
+.board .li:nth-child(3),.fboard .li:nth-child(3){--cut:polygon(0 8%,97% 0,100% 90%,3% 100%)}
+.board .li:nth-child(4),.fboard .li:nth-child(4){--cut:polygon(3% 0,100% 0,97% 100%,0 92%)}
+.board .li:nth-child(5),.fboard .li:nth-child(5){--cut:polygon(0 0,98% 10%,100% 100%,2% 94%)}
+.board .li .nm,.fboard .li .nm{font-family:var(--f-marker);font-size:1.3rem;line-height:1.2;letter-spacing:.02em;text-transform:none;text-shadow:2px 2px 0 var(--red-deep)}
+.board .li .nm small,.board .li .nm .you,.fboard .li .nm .you{text-shadow:none}
+.li.lead{--off:5px;--in:0px;--fill:var(--red);--glow:rgba(255,64,64,.5)}
+.li.lead .nm{text-shadow:2px 2px 0 var(--ink)}
+.li.lead .rank,.li.lead .nm .you{color:var(--white)}
+.li.lead .nm small{color:var(--paper)}
+.li.lead .plus{color:var(--white);text-shadow:2px 2px 0 var(--red-deep)}
+.li.lead .chip{background:var(--white);color:var(--red);border-color:var(--ink)}
+
+/* score sticker */
+.chip{flex:none;box-shadow:-3px 3px 0 var(--glitch);display:inline-grid;place-items:center;min-width:44px;height:40px;padding:0 6px;box-sizing:border-box;background:var(--red);color:var(--white);border:2px solid var(--white);font-family:var(--f-display);font-size:1.3rem;font-variant-numeric:tabular-nums;transform:rotate(-3deg)}
+.plus{flex:none;font-family:var(--f-display);font-size:1.3rem;font-variant-numeric:tabular-nums;color:var(--red-hot);min-width:2.4em;text-align:right}
+.plus.zero{color:#5f5a56}
+.plus.neg{color:var(--white)}
+.au{font-weight:400;color:var(--red-hot);text-transform:uppercase;letter-spacing:.1em}
+.rank{flex:none;width:1.4em;font-family:var(--f-display);font-size:1.3rem;color:var(--mute);font-variant-numeric:tabular-nums}
+
+/* the anonymous story: a typed page taped to the wall */
+.storycard{position:relative;color:var(--ink);background:var(--paper);padding:46px 20px 26px;transform:rotate(-1deg);box-shadow:8px 8px 0 var(--red);margin:14px 4px 0}
+.storycard::before,.storycard::after{content:"";position:absolute;top:-12px;width:86px;height:26px;background:rgba(225,38,45,.88)}
+.storycard::before{left:-14px;transform:rotate(-14deg)}
+.storycard::after{right:-14px;transform:rotate(11deg)}
+.storycard .hd{position:absolute;top:14px;left:20px;right:20px;display:flex;justify-content:space-between;font-family:var(--f-display);font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;color:var(--red)}
+.typed{font-size:1.14rem;line-height:1.65;white-space:pre-wrap;overflow-wrap:break-word;hyphens:manual;margin:0}
+.stamp{display:inline-block;margin-top:20px;padding:6px 12px;border:4px solid var(--red);color:var(--red);font-family:var(--f-display);font-size:1.5rem;text-transform:uppercase;letter-spacing:.03em;transform:rotate(-5deg);animation:stamp .3s cubic-bezier(.2,1.7,.4,1) both}
+@keyframes stamp{from{transform:rotate(-5deg) scale(1.6)}to{transform:rotate(-5deg) scale(1)}}
+
+/* guessing */
+.wager{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.wager .amt{font-family:var(--f-display);font-size:2.2rem;min-width:2ch;text-align:center;font-variant-numeric:tabular-nums}
+
+.winner{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding-block:6px}
+.winner h1{font-size:3rem}
+.winner h1 span{color:var(--red-hot)}
+.winner .chip{min-width:72px;height:60px;font-size:2rem}
+.notice{padding:14px 16px;border:2px dashed var(--white);color:var(--paper)}
+.rules{font-size:.95rem;line-height:1.7}
+.rules b{font-weight:400;color:var(--white);background:var(--red);padding-inline:4px}
+
+/* between-round title page */
+#flash{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:16px;overflow-y:auto;background:var(--bg) radial-gradient(circle,rgba(225,38,45,.18) 1px,transparent 1.5px) 0 0/6px 6px;cursor:pointer}
+.flash-in{display:flex;flex-direction:column;align-items:center;gap:18px;max-width:100%;text-align:center;animation:slam .55s cubic-bezier(.2,1.4,.4,1) both}
+#flash .ransom{font-size:clamp(3rem,17vw,6rem);justify-content:center}
+.flash-sub{font-family:var(--f-spray);font-size:clamp(1.4rem,7vw,2.2rem);line-height:1.15;color:var(--red-hot);transform:rotate(-3deg)}
+.flash-note{color:var(--paper);font-size:1.05rem}
+.fboard{width:min(100%,420px);text-align:left}
+.flash-in.win .ransom{font-size:clamp(2.6rem,14vw,6.5rem)}
+.flash-in.win .flash-sub{font-size:clamp(1.6rem,8vw,2.6rem)}
+@keyframes slam{0%{transform:scale(2.3) rotate(-8deg)}55%{transform:scale(.94) rotate(1.5deg)}100%{transform:scale(1) rotate(0)}}
+
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-width:calc(100% - 32px);box-sizing:border-box;background:var(--white);color:var(--ink);border:2px solid var(--ink);box-shadow:5px 5px 0 var(--red);padding:12px 16px;z-index:11}
+@media (prefers-reduced-motion:reduce){.stamp,.flash-in{animation:none}.storycard,.rn,.chip,.v{transform:none!important}}
+/* THEMES:BEGIN (generated by themes/inline.py, edit themes/*.css) */
+/* --- pistols --- */
+html[data-theme=pistols]{--cream:#efe8d6; --kraft:#cdb083; --newsp:#ddd6c2; --yellow:#e6dc6a; --magenta:#c43a83; --uk-red:#c8202f; --uk-blue:#22408f; --bg:#ddd6c2; --bg-2:var(--cream); --line:#000; --paper:var(--cream); --news:var(--newsp); --white:#ffffff; --ink:#0b0b0b; --red:var(--magenta); --red-hot:var(--magenta); --red-deep:#000; --mute:#3b3732; --glitch:#000; --torn:polygon(0 4%,7% 0,15% 3%,24% 0,33% 4%,41% 1%,50% 4%,58% 0,67% 3%,75% 0,84% 4%,92% 1%,100% 3%,99% 30%,100% 62%,99% 97%,91% 100%,82% 96%,73% 100%,64% 97%,55% 100%,46% 96%,37% 100%,28% 97%,19% 100%,10% 96%,0 99%,1% 66%,0 33%); color-scheme:light;}
+html[data-theme=pistols] body{color:#0b0b0b;background-color:#c9c7c0;background-image:radial-gradient(ellipse at 30% 20%,rgba(255,250,235,.25),transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(0,0,0,.07),transparent 55%)}
+html[data-theme=pistols] .wrap{gap:24px}
+html[data-theme=pistols] .fine{color:#2c2924}
+html[data-theme=pistols] .eyebrow{display:inline-block;width:fit-content;background:#0b0b0b;color:var(--cream);padding:4px 10px;letter-spacing:.14em;transform:rotate(-1.2deg)}
+html[data-theme=pistols] .ransom{width:fit-content;background:#0b0b0b;padding:8px 12px 10px;clip-path:var(--torn)}
+html[data-theme=pistols] .rn.r0{background:var(--cream);color:#000}
+html[data-theme=pistols] .rn.r1{background:#fff;color:#000;font-family:var(--f-display)}
+html[data-theme=pistols] .rn.r2{background:var(--newsp);color:#000;box-shadow:none}
+html[data-theme=pistols] .rn.r3{background:#fff;color:#000}
+html[data-theme=pistols] .rn.r4{background:var(--kraft)}
+html[data-theme=pistols] .rn.r5{background:#fff;box-shadow:none}
+html[data-theme=pistols] .rn.r6{background:var(--yellow);color:#000}
+html[data-theme=pistols] .rn.r7{background:#fff;color:#000}
+html[data-theme=pistols] .hero{position:relative}
+html[data-theme=pistols] .top{position:relative}
+html[data-theme=pistols] .top::after{content:"★";position:absolute;left:-12px;top:-14px;font-size:2.2rem;line-height:1;color:#000;-webkit-text-stroke:2px #fff;transform:rotate(14deg);pointer-events:none}
+html[data-theme=pistols] .topic h1{font-size:2.3rem}
+html[data-theme=pistols] .topic h1 span{background:#0b0b0b;color:var(--cream);padding:0 8px;line-height:1.25}
+html[data-theme=pistols] .topic p:last-child{color:#0b0b0b}
+html[data-theme=pistols] .card{background:var(--cream);color:#0b0b0b;border:0;box-shadow:none;clip-path:var(--torn);padding:30px 22px 28px}
+html[data-theme=pistols] .card:nth-of-type(2n){background:var(--kraft)}
+html[data-theme=pistols] input[type=text],html[data-theme=pistols] textarea{background:#fff;color:#000;border:3px solid #000}
+html[data-theme=pistols] input::placeholder,html[data-theme=pistols] textarea::placeholder{color:#777}
+html[data-theme=pistols] input:focus,html[data-theme=pistols] textarea:focus{border-color:#000;box-shadow:4px 4px 0 var(--magenta)}
+html[data-theme=pistols]{--rip-a:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80' preserveAspectRatio='none'%3E%3Cfilter id='r' x='-5%' y='-10%' width='110%' height='120%'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.045 .08' numOctaves='4' seed='4'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='14' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='8' y='8' width='284' height='64' filter='url(%23r)'/%3E%3C/svg%3E");--rip-b:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80' preserveAspectRatio='none'%3E%3Cfilter id='r' x='-5%' y='-10%' width='110%' height='120%'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.07 .12' numOctaves='4' seed='11'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='9' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='6' y='6' width='288' height='68' filter='url(%23r)'/%3E%3C/svg%3E")}
+html[data-theme=pistols] .g{filter:drop-shadow(2px 3px 1px rgba(0,0,0,.4));--glow:transparent;--sh:#f6f2e8;--fill:#fff;--off:0px;--in:5px}
+html[data-theme=pistols] .g::before,html[data-theme=pistols] .g::after{clip-path:none;transform:none}
+html[data-theme=pistols] .g::before{inset:-6px -8px;background:radial-gradient(circle,rgba(0,0,0,.05) 0 .8px,transparent 1.2px) 0 0/4px 4px,var(--sh);-webkit-mask:var(--rip-a) 0 0/100% 100% no-repeat;mask:var(--rip-a) 0 0/100% 100% no-repeat}
+html[data-theme=pistols] .g::after{inset:var(--in);background:radial-gradient(circle,rgba(0,0,0,.16) 0 .9px,transparent 1.3px) 0 0/4px 4px,var(--fill);-webkit-mask:var(--rip-b) 0 0/100% 100% no-repeat;mask:var(--rip-b) 0 0/100% 100% no-repeat}
+html[data-theme=pistols] .g:nth-child(2n)::before{transform:scaleX(-1)}
+html[data-theme=pistols] .g:nth-child(3n)::after{transform:scaleY(-1)}
+html[data-theme=pistols] .primary{--fill:#0b0b0b;color:var(--cream);font-family:var(--f-display);text-transform:uppercase;letter-spacing:.05em;font-size:1.9rem;text-shadow:none;transform:rotate(-1.2deg);padding:18px 26px 16px}
+html[data-theme=pistols] .primary::after{background:radial-gradient(circle,rgba(255,255,255,.13) 0 .9px,transparent 1.3px) 0 0/4px 4px,var(--fill)}
+html[data-theme=pistols] .btn,html[data-theme=pistols] .btn.danger{--fill:var(--cream);color:#000;font-family:var(--f-display);text-transform:uppercase;letter-spacing:.06em;padding:12px 22px}
+html[data-theme=pistols] .btn:hover:not(:disabled),html[data-theme=pistols] .btn.danger:hover:not(:disabled){--fill:var(--yellow);color:#000}
+html[data-theme=pistols] .btn.danger{--fill:var(--magenta);color:#fff}
+html[data-theme=pistols] .btn:nth-of-type(2n){transform:rotate(1.5deg)}
+html[data-theme=pistols] .opt{--fill:var(--cream);--in:5px;color:#000;padding:16px 22px}
+html[data-theme=pistols] .opt:nth-child(2n){--fill:var(--kraft)}
+html[data-theme=pistols] .opt:nth-child(3){--fill:#fff}
+html[data-theme=pistols] .opt .tn{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.04em;font-size:1.45rem;text-shadow:none;color:#000}
+html[data-theme=pistols] .opt[aria-pressed=true],html[data-theme=pistols] .opt.mine{--fill:#0b0b0b}
+html[data-theme=pistols] .opt[aria-pressed=true] .tn,html[data-theme=pistols] .opt.mine .tn,html[data-theme=pistols] .opt.mine .yp{color:var(--cream)}
+html[data-theme=pistols] .vt{background:#fff;color:#000;box-shadow:inset 0 0 0 2px #000}
+html[data-theme=pistols] .vt:nth-child(2n){background:var(--yellow);color:#000}
+html[data-theme=pistols] .seg button{--fill:var(--cream);color:#000;font-family:var(--f-display);text-shadow:none}
+html[data-theme=pistols] .seg button[aria-pressed=true]{--fill:#0b0b0b;color:var(--cream)}
+html[data-theme=pistols] .pill{border:3px solid #000;border-radius:999px;color:#000;background:#fff;font-family:var(--f-display);letter-spacing:.08em}
+html[data-theme=pistols] .pill.hot{background:var(--magenta);color:#fff}
+html[data-theme=pistols] .pip{border-color:#000}
+html[data-theme=pistols] .pip.dbl{border-color:#000}
+html[data-theme=pistols] .pip.done{background:#000;border-color:#000}
+html[data-theme=pistols] .pip.dbl.done{background:var(--magenta);border-color:#000}
+html[data-theme=pistols] .pip.now{border-color:#000;background:repeating-linear-gradient(90deg,#000 0 3px,transparent 3px 6px)}
+html[data-theme=pistols] .notice{border:3px solid #000;color:#000;background:#fff}
+html[data-theme=pistols] .li{border-bottom-color:#000}
+html[data-theme=pistols] .li .nm small{color:#2c2924}
+html[data-theme=pistols] .li .nm .you{color:var(--cream);background:#000;padding:0 5px}
+html[data-theme=pistols] .li.empty .nm{color:#5a554d}
+html[data-theme=pistols] .tag{border-color:#000;color:#000;background:#fff}
+html[data-theme=pistols] .tag.ok{background:#000;color:var(--cream);border-color:#000}
+html[data-theme=pistols] .link{color:#000;text-decoration:underline}
+html[data-theme=pistols] .rules b{background:#000;color:var(--cream)}
+html[data-theme=pistols] .storycard{background:#fff;color:#0b0b0b;box-shadow:8px 8px 0 #000;transform:rotate(-1.5deg)}
+html[data-theme=pistols] .storycard::before,html[data-theme=pistols] .storycard::after{background:#0b0b0b;height:22px;width:92px}
+html[data-theme=pistols] .storycard .hd{color:#000}
+html[data-theme=pistols] .storycard .hd span:first-child{background:#000;color:var(--cream);padding:0 8px}
+html[data-theme=pistols] .stamp{border:0;background:#0b0b0b;color:var(--cream);box-shadow:5px 5px 0 var(--magenta);transform:rotate(-3deg)}
+html[data-theme=pistols] .card.board{background:none;clip-path:none;padding:0}
+html[data-theme=pistols] .card.board .eyebrow{background:#0b0b0b;color:var(--cream)}
+html[data-theme=pistols] .board .li,html[data-theme=pistols] .fboard .li{--fill:var(--cream);--in:5px;--glow:transparent;padding:14px 20px}
+html[data-theme=pistols] .board .li:nth-child(2n),html[data-theme=pistols] .fboard .li:nth-child(2n){--fill:var(--kraft)}
+html[data-theme=pistols] .board .li .nm,html[data-theme=pistols] .fboard .li .nm{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.04em;font-size:1.4rem;line-height:1.1;text-shadow:none;color:#000}
+html[data-theme=pistols] .li.lead{--fill:var(--yellow)}
+html[data-theme=pistols] .li.lead .nm{text-shadow:none}
+html[data-theme=pistols] .li.lead .rank,html[data-theme=pistols] .li.lead .nm small{color:#000}
+html[data-theme=pistols] .li.lead .nm .you{color:var(--cream)}
+html[data-theme=pistols] .rank{color:#000}
+html[data-theme=pistols] .plus{color:#000}
+html[data-theme=pistols] .plus.zero{color:#6b655b}
+html[data-theme=pistols] .plus.neg{color:var(--uk-red)}
+html[data-theme=pistols] .li.lead .plus{color:#000;text-shadow:none}
+html[data-theme=pistols] .chip{width:46px;min-width:46px;height:46px;padding:0;border-radius:50%;background:#fff;color:#000;border:3px solid #000;box-shadow:2px 3px 0 #000;transform:rotate(-8deg)}
+html[data-theme=pistols] .li.lead .chip{background:#0b0b0b;color:var(--cream)}
+html[data-theme=pistols] .au{color:#fff;background:var(--magenta);padding:0 5px}
+html[data-theme=pistols] #flash{background:#c9c7c0}
+html[data-theme=pistols] .flash-sub{color:#0b0b0b;font-family:var(--f-display);text-transform:uppercase;background:var(--yellow);padding:2px 10px}
+html[data-theme=pistols] .flash-note{color:#0b0b0b}
+html[data-theme=pistols] .winner h1 span{color:var(--magenta)}
+html[data-theme=pistols] .peek{background:#fff;border-color:#000}
+html[data-theme=pistols] .peek strong{color:var(--magenta)}
+/* --- army --- */
+html[data-theme=army]{--od:#4b5320; --od-dark:#2f3517; --od-deep:#1d2110; --od-light:#66713a; --khaki:#c8b98a; --manila:#ddcfa6; --stencil:#efeee6; --signal:#a3311f; --brass:#d9b44a; --steel:#c3c7c9; --bg:var(--od); --bg-2:var(--od-dark); --line:#232812; --paper:var(--manila); --news:var(--khaki); --white:var(--stencil); --ink:#151708; --red:var(--signal); --red-hot:var(--brass); --red-deep:#151708; --mute:#b9b28c; --glitch:#151708; --f-display:"Stardos Stencil","Black Ops One",serif; --f-spray:"Stardos Stencil","Black Ops One",serif; --f-marker:"Stardos Stencil","Black Ops One",serif; --f-type:"Special Elite","Courier New",monospace; --star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='41' fill='none' stroke='%23fff' stroke-width='8' stroke-dasharray='44.5 7' transform='rotate(-13.1 50 50)'/%3E%3Cpolygon fill='%23fff' points='50.0,21.0 57.2,42.1 79.5,42.4 61.6,55.8 68.2,77.1 50.0,64.2 31.8,77.1 38.4,55.8 20.5,42.4 42.8,42.1'/%3E%3C/svg%3E"); --worn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -13 0 0 0 8.7'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23w)'/%3E%3C/svg%3E"); --plate:polygon(9px 0,calc(100% - 9px) 0,100% 9px,100% calc(100% - 9px),calc(100% - 9px) 100%,9px 100%,0 calc(100% - 9px),0 9px); --blade:polygon(0 0,calc(100% - 28px) 0,100% 50%,calc(100% - 28px) 100%,0 100%,12px 50%); --blade-sm:polygon(10px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,10px 100%,0 50%); --grime:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03' numOctaves='4' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .08 0 0 0 0 .03 -1.7 0 0 0 .9'/%3E%3C/filter%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 .05 0 0 0 0 .05 0 0 0 0 .02 9 0 0 0 -6.1'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3Crect width='300' height='300' filter='url(%23s)'/%3E%3C/svg%3E"); --brushed:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px,rgba(0,0,0,.06) 3px 4px,transparent 4px 6px); --grind:var(--grime),radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(20,18,8,.42) 100%),linear-gradient(115deg,rgba(255,255,255,.05),transparent 35%,rgba(0,0,0,.12)),var(--brushed); --rivets:radial-gradient(circle at 9px 9px,rgba(255,255,255,.28) 0 1.5px,rgba(0,0,0,.55) 2px 3.2px,transparent 3.6px),radial-gradient(circle at calc(100% - 9px) 9px,rgba(255,255,255,.28) 0 1.5px,rgba(0,0,0,.55) 2px 3.2px,transparent 3.6px),radial-gradient(circle at 9px calc(100% - 9px),rgba(255,255,255,.28) 0 1.5px,rgba(0,0,0,.55) 2px 3.2px,transparent 3.6px),radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),rgba(255,255,255,.28) 0 1.5px,rgba(0,0,0,.55) 2px 3.2px,transparent 3.6px); color-scheme:dark;}
+html[data-theme=army] body{background-color:var(--od);background-image:var(--grime),var(--brushed), radial-gradient(circle at 12px 12px,rgba(255,255,255,.2) 0 1.6px,rgba(0,0,0,.5) 2.2px 3.6px,transparent 4px), linear-gradient(90deg,rgba(0,0,0,.38) 0 2px,rgba(255,255,255,.07) 2px 3px,transparent 3px), linear-gradient(0deg,rgba(0,0,0,.38) 0 2px,rgba(255,255,255,.07) 2px 3px,transparent 3px), radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.06),transparent 60%), radial-gradient(ellipse at 80% 90%,rgba(0,0,0,.25),transparent 55%); background-size:300px 300px,auto,220px 170px,220px 170px,220px 170px,100% 100%,100% 100%; background-position:0 0,0 0,-12px -12px,0 0,0 0,0 0,0 0;color:var(--stencil)}
+html[data-theme=army] .typed,html[data-theme=army] .wrap p,html[data-theme=army] .wrap small,html[data-theme=army] input[type=text],html[data-theme=army] textarea{text-shadow:0 0 .6px currentColor,.3px .2px 0 currentColor}
+html[data-theme=army] .fine{color:var(--mute)}
+html[data-theme=army] h1,html[data-theme=army] h2,html[data-theme=army] .rn,html[data-theme=army] .primary,html[data-theme=army] .btn,html[data-theme=army] .opt .tn,html[data-theme=army] .li .nm,html[data-theme=army] .chip,html[data-theme=army] .rank,html[data-theme=army] .plus,html[data-theme=army] .pill,html[data-theme=army] .flash-sub,html[data-theme=army] .stamp,html[data-theme=army] .eyebrow,html[data-theme=army] label,html[data-theme=army] .lbl,html[data-theme=army] .peek strong,html[data-theme=army] .seg button{font-weight:700}
+html[data-theme=army] h1,html[data-theme=army] .rn,html[data-theme=army] .flash-sub,html[data-theme=army] .stamp{-webkit-mask:var(--worn) 0 0/200px 200px;mask:var(--worn) 0 0/200px 200px}
+html[data-theme=army] .eyebrow{display:inline-block;width:fit-content;font-family:var(--f-spray);color:#151708;background:var(--grind),var(--khaki);letter-spacing:.2em;padding:4px 30px 3px 12px;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,0 100%)}
+html[data-theme=army] .ransom{gap:4px 14px;align-items:center}
+html[data-theme=army] .ransom::before{content:"";width:1.3em;height:1.3em;flex:none;background:var(--star) center/contain no-repeat}
+html[data-theme=army] .rw{gap:1px}
+html[data-theme=army] .rn{background:none!important;box-shadow:none!important;clip-path:none!important;transform:none!important;color:var(--stencil)!important;font-family:var(--f-display)!important;font-style:normal!important;text-transform:uppercase!important;padding:0!important;font-size:1em!important;letter-spacing:.03em}
+html[data-theme=army] .hero .tag-line{color:var(--khaki)}
+html[data-theme=army] .card{background:var(--rivets),var(--grind),linear-gradient(180deg,var(--od-dark),#272c13);border:2px solid #151708;box-shadow:inset 0 0 0 2px rgba(255,255,255,.06),5px 5px 0 rgba(0,0,0,.45);clip-path:var(--plate);padding:24px 22px}
+html[data-theme=army] .card.settings{border-style:solid;box-shadow:inset 0 0 0 2px var(--brass)}
+html[data-theme=army] input[type=text],html[data-theme=army] textarea{background:var(--manila);color:#151708;border:2px solid #151708}
+html[data-theme=army] input::placeholder,html[data-theme=army] textarea::placeholder{color:#6d6650;text-shadow:none}
+html[data-theme=army] input:focus,html[data-theme=army] textarea:focus{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass)}
+html[data-theme=army] label,html[data-theme=army] .lbl{font-family:var(--f-spray);color:var(--khaki);letter-spacing:.16em}
+html[data-theme=army] .g{filter:none;--glow:transparent;--sh:#0d0f06;--fill:var(--od-light);--off:4px;--in:0px;--cut:var(--blade-sm)}
+html[data-theme=army] .g::before{background:var(--sh)}
+html[data-theme=army] .g::after{background:var(--grind),var(--fill);box-shadow:inset 0 0 0 1px rgba(0,0,0,.45)}
+html[data-theme=army] .primary{--cut:var(--blade);--fill:var(--od-dark);font-family:var(--f-display);font-size:1.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--stencil);text-shadow:none;padding:14px 46px 12px 58px}
+html[data-theme=army] .primary::after{background:linear-gradient(90deg,transparent 0 14px,var(--stencil) 14px 22px,#111 22px 30px,var(--stencil) 30px 38px,transparent 38px),var(--grind),var(--fill)}
+html[data-theme=army] .btn{--fill:var(--khaki);color:#151708;font-family:var(--f-spray);text-transform:uppercase;letter-spacing:.12em;padding:10px 24px}
+html[data-theme=army] .btn:hover:not(:disabled){--fill:var(--stencil);color:#151708}
+html[data-theme=army] .btn.danger{--fill:var(--signal);color:var(--stencil)}
+html[data-theme=army] .btn.danger:hover:not(:disabled){--fill:var(--stencil);color:var(--signal)}
+html[data-theme=army] .seg button{--fill:var(--od-dark);--off:3px;font-family:var(--f-display);color:var(--stencil);text-shadow:none}
+html[data-theme=army] .seg button[aria-pressed=true]{--fill:var(--khaki);color:#151708}
+html[data-theme=army] .opt{--fill:var(--od-light);--off:4px;--in:0px;--cut:var(--blade);color:var(--stencil);padding-right:40px}
+html[data-theme=army] .opt .tn{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.08em;font-size:1.4rem;text-shadow:none;color:var(--stencil)}
+html[data-theme=army] .opt[aria-pressed=true],html[data-theme=army] .opt.mine{--fill:var(--khaki);--off:5px}
+html[data-theme=army] .opt[aria-pressed=true] .tn,html[data-theme=army] .opt.mine .tn,html[data-theme=army] .opt.mine .yp{color:#151708}
+html[data-theme=army] .opt[aria-pressed=true] .tn::before,html[data-theme=army] .opt.mine .tn::before,html[data-theme=army] .li.lead .nm::before{content:"";display:inline-block;width:.95em;height:.95em;margin-right:.35em;vertical-align:-.1em;background:currentColor;-webkit-mask:var(--star) center/contain no-repeat;mask:var(--star) center/contain no-repeat}
+html[data-theme=army] .vt{background:var(--steel);color:#151708;border-radius:6px;transform:none;font-family:var(--f-spray);font-weight:700}
+html[data-theme=army] .vt:nth-child(2n){background:var(--manila);transform:none}
+html[data-theme=army] .pill{border:0;color:#151708;background:var(--grind),var(--khaki);font-family:var(--f-spray);padding:5px 18px 4px;clip-path:var(--blade-sm)}
+html[data-theme=army] .pill.hot{background:var(--grind),var(--signal);color:var(--stencil)}
+html[data-theme=army] .pip{transform:skewX(-30deg);border-color:var(--od-dark);height:12px}
+html[data-theme=army] .pip.dbl{border-color:var(--od-dark)}
+html[data-theme=army] .pip.done{background:var(--khaki);border-color:var(--khaki)}
+html[data-theme=army] .pip.dbl.done{background:var(--brass);border-color:var(--brass)}
+html[data-theme=army] .pip.now{border-color:var(--stencil);background:repeating-linear-gradient(-45deg,var(--stencil) 0 3px,transparent 3px 7px)}
+html[data-theme=army] .topic h1{font-size:2.3rem;letter-spacing:.03em}
+html[data-theme=army] .topic h1 span{background:none;color:var(--stencil)}
+html[data-theme=army] .topic p:last-child{color:var(--khaki)}
+html[data-theme=army] .notice{border:2px solid var(--khaki);color:var(--khaki);background:var(--od-dark)}
+html[data-theme=army] .li{border-bottom-color:rgba(0,0,0,.4)}
+html[data-theme=army] .li .nm{font-family:var(--f-display)}
+html[data-theme=army] .li .nm .you{color:var(--brass);-webkit-mask:none;mask:none}
+html[data-theme=army] .tag{border-color:var(--khaki);color:var(--khaki)}
+html[data-theme=army] .tag.ok{background:var(--khaki);color:#151708;border-color:var(--khaki)}
+html[data-theme=army] .tag.no{background:var(--signal);border-color:var(--signal)}
+html[data-theme=army] .link{color:var(--brass)}
+html[data-theme=army] .rules b{background:var(--khaki);color:#151708}
+html[data-theme=army] .peek{background:var(--od-deep);border-color:var(--brass)}
+html[data-theme=army] .peek strong{color:var(--brass)}
+html[data-theme=army] .storycard{background:var(--grime),var(--manila);color:#151708;box-shadow:6px 6px 0 rgba(0,0,0,.5);transform:rotate(-.6deg);padding-top:50px}
+html[data-theme=army] .storycard::before{left:0;top:-16px;width:130px;height:18px;background:var(--manila);transform:none;clip-path:polygon(10% 0,90% 0,100% 100%,0 100%)}
+html[data-theme=army] .storycard::after{display:none}
+html[data-theme=army] .storycard .hd{color:#151708;font-family:var(--f-spray);font-weight:700;letter-spacing:.18em}
+html[data-theme=army] .storycard .hd span:first-child{color:var(--signal)}
+html[data-theme=army] .stamp{border:3px double var(--signal);color:var(--signal);font-family:var(--f-display);background:none;letter-spacing:.06em}
+html[data-theme=army] .card.board{background:none;border:0;box-shadow:none;clip-path:none;padding:0}
+html[data-theme=army] .board .li,html[data-theme=army] .fboard .li{--fill:var(--od-light);--off:4px;--in:0px;--glow:transparent;--cut:var(--blade);padding:14px 40px 18px 22px}
+html[data-theme=army] .board .li::after,html[data-theme=army] .fboard .li::after{background:radial-gradient(circle,rgba(0,0,0,.5) 0 1.6px,transparent 2.2px) 16px 5px/18px 6px repeat-x,radial-gradient(circle,rgba(0,0,0,.5) 0 1.6px,transparent 2.2px) 16px calc(100% - 5px)/18px 6px repeat-x,var(--grind),var(--fill)}
+html[data-theme=army] .board .li:nth-child(2n),html[data-theme=army] .fboard .li:nth-child(2n){--fill:#5a6530}
+html[data-theme=army] .board .li .nm,html[data-theme=army] .fboard .li .nm{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.06em;font-size:1.35rem;line-height:1.15;text-shadow:none;color:var(--stencil)}
+html[data-theme=army] .board .li .nm small{font-family:var(--f-type);font-weight:400;text-transform:none;letter-spacing:0;color:var(--khaki)}
+html[data-theme=army] .li.lead{--fill:var(--khaki);--off:5px}
+html[data-theme=army] .li.lead .nm,html[data-theme=army] .li.lead .rank,html[data-theme=army] .li.lead .plus,html[data-theme=army] .li.lead .nm small{color:#151708;text-shadow:none}
+html[data-theme=army] .rank{color:var(--khaki);font-family:var(--f-display)}
+html[data-theme=army] .plus{color:var(--brass);font-family:var(--f-display)}
+html[data-theme=army] .plus.zero{color:rgba(239,238,230,.4)}
+html[data-theme=army] .chip{transform:rotate(-4deg);background:radial-gradient(circle at 9px 50%,var(--od-dark) 0 3px,transparent 3.5px),var(--grime),linear-gradient(160deg,#b4b8ba,#9da2a5);color:#151708;border:0;border-radius:9px;box-shadow:2px 2px 0 rgba(0,0,0,.5);font-family:var(--f-display);min-width:54px;padding-left:16px}
+html[data-theme=army] .li.lead .chip{background:radial-gradient(circle at 9px 50%,var(--khaki) 0 3px,transparent 3.5px),var(--grime),linear-gradient(160deg,#b4b8ba,#9da2a5)}
+html[data-theme=army] .au{color:var(--brass)}
+html[data-theme=army] .winner h1 span{color:var(--brass)}
+html[data-theme=army] #flash{background:var(--od-dark) repeating-linear-gradient(-45deg,rgba(0,0,0,.18) 0 14px,transparent 14px 28px)}
+html[data-theme=army] .flash-sub{font-family:var(--f-display);color:#151708;background:var(--grind),var(--khaki);transform:none;letter-spacing:.06em;text-transform:uppercase;padding:4px 40px 4px 22px;clip-path:var(--blade)}
+html[data-theme=army] .flash-note{color:var(--khaki)}
+/* --- pixel --- */
+@keyframes pxblink{50%{opacity:.25}}
+html[data-theme=pixel]{--night:#0b0f2e; --win:#1b2a8f; --win-2:#0e1660; --gold:#ffd23f; --coin-dark:#b8860b; --px-red:#e43b44; --px-green:#63c74d; --px-cyan:#2ce8f5; --px-pink:#ff77a8; --px-white:#f4f4f4; --px-ink:#0b0b17; --bg:var(--night); --bg-2:var(--win); --line:#3a4466; --paper:var(--px-white); --news:#c0cbdc; --white:var(--px-white); --ink:var(--px-ink); --red:var(--px-red); --red-hot:var(--gold); --red-deep:var(--px-ink); --mute:#9aa6d8; --glitch:var(--px-ink); --f-display:"Press Start 2P",monospace; --f-spray:"Press Start 2P",monospace; --f-marker:"Press Start 2P",monospace; --f-type:"VT323","Courier New",monospace; --px:polygon(0 4px,4px 4px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px)); --bevel:inset -4px -4px 0 rgba(0,0,0,.35),inset 4px 4px 0 rgba(255,255,255,.35); --frame:0 -4px 0 0 var(--px-white),0 4px 0 0 var(--px-white),-4px 0 0 0 var(--px-white),4px 0 0 0 var(--px-white),0 -8px 0 0 var(--px-ink),0 8px 0 0 var(--px-ink),-8px 0 0 0 var(--px-ink),8px 0 0 0 var(--px-ink),-4px -4px 0 0 var(--px-ink),4px -4px 0 0 var(--px-ink),-4px 4px 0 0 var(--px-ink),4px 4px 0 0 var(--px-ink); font-size:18px; color-scheme:dark;}
+html[data-theme=pixel] body{color:var(--px-white);font:20px/1.25 var(--f-type);-webkit-font-smoothing:none;background-color:var(--night);background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' shape-rendering='crispEdges'%3E%3Cg fill='%23f4f4f4'%3E%3Crect x='12' y='20' width='3' height='3'/%3E%3Crect x='90' y='64' width='3' height='3'/%3E%3Crect x='170' y='14' width='3' height='3'/%3E%3Crect x='210' y='120' width='3' height='3'/%3E%3Crect x='40' y='150' width='3' height='3'/%3E%3Crect x='130' y='200' width='3' height='3'/%3E%3C/g%3E%3Cg fill='%232ce8f5'%3E%3Crect x='60' y='100' width='3' height='3'/%3E%3Crect x='190' y='180' width='3' height='3'/%3E%3C/g%3E%3Cg fill='%23ffd23f'%3E%3Crect x='150' y='110' width='3' height='3'/%3E%3Crect x='20' y='220' width='3' height='3'/%3E%3C/g%3E%3C/svg%3E"), linear-gradient(180deg,#0b0f2e 0 55%,#1d1450 75%,#3b1f5e 100%);background-attachment:scroll,fixed}
+html[data-theme=pixel] .wrap{gap:26px}
+html[data-theme=pixel] h1,html[data-theme=pixel] h2{font-family:var(--f-display);line-height:1.5;letter-spacing:0}
+html[data-theme=pixel] h1{font-size:1.1rem}
+html[data-theme=pixel] h2{font-size:.8rem}
+html[data-theme=pixel] .eyebrow{font-family:var(--f-display);font-size:.55rem;letter-spacing:.08em;color:var(--gold)}
+html[data-theme=pixel] .fine{color:var(--mute);font-size:1rem}
+html[data-theme=pixel] label,html[data-theme=pixel] .lbl{font-family:var(--f-display);font-size:.5rem;letter-spacing:.06em;color:var(--px-cyan)}
+html[data-theme=pixel] .v{transform:none!important;opacity:1!important}
+html[data-theme=pixel] .ransom{--emblem:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 13' shape-rendering='crispEdges'%3E%3Cpath fill='%233e8ef7' d='M2 0h8v1h-8zM1 1h10v1h-10zM0 2h4v1h-4zM8 2h4v1h-4zM0 3h3v1h-3zM5 3h2v1h-2zM9 3h3v1h-3zM0 4h7v1h-7zM9 4h3v1h-3zM0 5h5v1h-5zM8 5h4v1h-4zM0 6h5v1h-5zM7 6h5v1h-5zM0 7h12v1h-12zM1 8h4v1h-4zM7 8h4v1h-4zM2 9h8v1h-8zM2 10h3v1h-3zM1 11h2v1h-2zM0 12h1v1h-1z'/%3E%3Cpath fill='%23e43b44' d='M4 2h4v1h-4zM3 3h2v1h-2zM7 3h2v1h-2zM7 4h2v1h-2zM5 5h3v1h-3zM5 6h2v1h-2zM5 8h2v1h-2z'/%3E%3C/svg%3E");gap:0 .5em;align-items:center;width:fit-content;padding:.45em .7em .4em;margin:6px;box-shadow:0 -4px 0 0 var(--px-red),0 4px 0 0 var(--px-red),-4px 0 0 0 var(--px-red),4px 0 0 0 var(--px-red);filter:drop-shadow(3px 3px 0 var(--px-ink))}
+html[data-theme=pixel] .ransom::before{content:"";flex:none;width:1.25em;height:1.35em;background:var(--emblem) center/contain no-repeat;image-rendering:pixelated}
+html[data-theme=pixel] .rw{gap:0}
+html[data-theme=pixel] .rn{font-family:var(--f-display)!important;font-style:normal!important;font-weight:400!important;text-transform:uppercase!important;transform:none!important;clip-path:none!important;box-shadow:none!important;padding:0!important;font-size:.8em!important;line-height:1!important;color:transparent!important;background:linear-gradient(180deg,#63c74d 0 20%,#ffd23f 20% 40%,#f77622 40% 60%,#e43b44 60% 80%,#b55088 80% 100%)!important;-webkit-background-clip:text!important;background-clip:text!important}
+html[data-theme=pixel] #flash .ransom{padding:.35em .5em .3em}
+html[data-theme=pixel] .hero .tag-line{color:var(--px-cyan)}
+html[data-theme=pixel] .card{background:linear-gradient(180deg,var(--win),var(--win-2));border:0;box-shadow:var(--frame);margin:8px;padding:20px 18px}
+html[data-theme=pixel] .card.settings{background:linear-gradient(180deg,#3a1d5e,#22104a)}
+html[data-theme=pixel] input[type=text],html[data-theme=pixel] textarea{background:var(--px-ink);color:var(--px-white);border:4px solid var(--px-white);font:1.15rem/1.2 var(--f-type)}
+html[data-theme=pixel] input::placeholder,html[data-theme=pixel] textarea::placeholder{color:#6b75a8}
+html[data-theme=pixel] input:focus,html[data-theme=pixel] textarea:focus{border-color:var(--gold)}
+html[data-theme=pixel] .g{filter:none;--glow:transparent;--sh:var(--px-ink);--fill:var(--win);--off:4px;--in:0px;--cut:var(--px)}
+html[data-theme=pixel] .g::after{background:var(--fill);box-shadow:var(--bevel)}
+html[data-theme=pixel] .g:active:not(:disabled){transform:translate(4px,4px)}
+html[data-theme=pixel] .primary{--fill:var(--px-green);font-family:var(--f-display);font-size:.9rem;line-height:1.4;text-transform:uppercase;color:var(--px-white);text-shadow:2px 2px 0 var(--px-ink);padding:16px 18px 14px}
+html[data-theme=pixel] .btn{--fill:var(--gold);color:var(--px-ink);font-family:var(--f-display);font-size:.55rem;line-height:1.5;padding:10px 14px}
+html[data-theme=pixel] .btn:hover:not(:disabled){--fill:var(--px-white);color:var(--px-ink)}
+html[data-theme=pixel] .btn.danger{--fill:var(--px-red);color:var(--px-white)}
+html[data-theme=pixel] .btn.danger:hover:not(:disabled){--fill:var(--px-white);color:var(--px-red)}
+html[data-theme=pixel] .btn.sm{font-size:.5rem}
+html[data-theme=pixel] .seg button{--fill:var(--win-2);font-family:var(--f-display);font-size:1rem;text-shadow:2px 2px 0 var(--px-ink);color:var(--px-white)}
+html[data-theme=pixel] .seg.looks button{font-size:.5rem;line-height:1.6}
+html[data-theme=pixel] .seg button[aria-pressed=true]{--fill:var(--gold);color:var(--px-ink);text-shadow:none}
+html[data-theme=pixel] .opt{--fill:var(--win-2);--cut:var(--px);--off:4px;--in:0px;min-height:52px}
+html[data-theme=pixel] .opt .tn{font-family:var(--f-display);font-size:.75rem;line-height:1.5;text-shadow:2px 2px 0 var(--px-ink);color:var(--px-white)}
+html[data-theme=pixel] .opt[aria-pressed=true],html[data-theme=pixel] .opt.mine{--fill:var(--gold)}
+html[data-theme=pixel] .opt[aria-pressed=true] .tn,html[data-theme=pixel] .opt.mine .tn,html[data-theme=pixel] .opt.mine .yp{color:var(--px-ink);text-shadow:none}
+html[data-theme=pixel] .opt[aria-pressed=true] .tn::before,html[data-theme=pixel] .opt.mine .tn::before{content:"▶ "}
+html[data-theme=pixel] .yp{font-family:var(--f-display);font-size:.45rem}
+html[data-theme=pixel] .vt{font-family:var(--f-type);font-size:1rem;background:var(--px-white);color:var(--px-ink);transform:none;box-shadow:var(--bevel)}
+html[data-theme=pixel] .vt:nth-child(2n){background:var(--px-cyan);transform:none}
+html[data-theme=pixel] .pill{font-family:var(--f-display);font-size:.5rem;border:0;background:var(--px-ink);color:var(--gold);box-shadow:0 0 0 4px var(--px-white);padding:6px 8px}
+html[data-theme=pixel] .pill.hot{background:var(--px-red);color:var(--px-white)}
+html[data-theme=pixel] .pip{transform:none;border:0;height:12px;background:#2a3166;box-shadow:var(--bevel)}
+html[data-theme=pixel] .pip.dbl{background:#3a2466}
+html[data-theme=pixel] .pip.done{background:var(--px-red)}
+html[data-theme=pixel] .pip.dbl.done{background:var(--gold)}
+html[data-theme=pixel] .pip.now{background:var(--px-white);animation:pxblink 1s steps(2) infinite}
+html[data-theme=pixel] .topic h1{font-size:1.15rem;line-height:1.7}
+html[data-theme=pixel] .topic h1 span{background:none;color:var(--px-white);text-shadow:3px 3px 0 var(--px-red)}
+html[data-theme=pixel] .topic p:last-child{color:var(--px-white)}
+html[data-theme=pixel] .notice{border:4px solid var(--px-white);background:var(--px-ink);color:var(--px-white)}
+html[data-theme=pixel] .li{border-bottom:4px dotted #3a4466}
+html[data-theme=pixel] .li .nm{font-family:var(--f-display);font-size:.7rem;line-height:1.6}
+html[data-theme=pixel] .li .nm small{font-family:var(--f-type);font-size:1.05rem;color:var(--mute)}
+html[data-theme=pixel] .li .nm .you{font-size:.5rem;color:var(--gold)}
+html[data-theme=pixel] .tag{font-family:var(--f-display);font-size:.45rem;border:0;background:#2a3166;color:var(--px-white);box-shadow:var(--bevel);padding:5px 7px}
+html[data-theme=pixel] .tag.ok{background:var(--px-green);color:var(--px-ink)}
+html[data-theme=pixel] .tag.no{background:var(--px-red)}
+html[data-theme=pixel] .link{color:var(--px-cyan);font-family:var(--f-display);font-size:.5rem}
+html[data-theme=pixel] .rules b{background:var(--gold);color:var(--px-ink)}
+html[data-theme=pixel] .peek{background:var(--px-ink);border:4px solid var(--gold)}
+html[data-theme=pixel] .peek strong{font-family:var(--f-display);font-size:.9rem;color:var(--gold)}
+html[data-theme=pixel] .storycard{background:var(--px-ink);color:var(--px-white);transform:none;box-shadow:var(--frame);margin:22px 8px 8px;padding:44px 18px 22px}
+html[data-theme=pixel] .storycard::before,html[data-theme=pixel] .storycard::after{display:none}
+html[data-theme=pixel] .storycard .hd{font-family:var(--f-display);font-size:.5rem;color:var(--px-cyan);top:16px}
+html[data-theme=pixel] .storycard .hd span:first-child{color:var(--gold)}
+html[data-theme=pixel] .typed{font-size:1.45rem;line-height:1.3}
+html[data-theme=pixel] .stamp{font-family:var(--f-display);font-size:.75rem;line-height:1.5;border:4px solid var(--gold);color:var(--gold);transform:none;animation:none}
+html[data-theme=pixel] .card.board{background:none;box-shadow:none;margin:14px 0 0;padding:0}
+html[data-theme=pixel] .board .li,html[data-theme=pixel] .fboard .li{--fill:var(--win);--cut:var(--px);--off:4px;--in:0px;--glow:transparent;border:0;padding:12px 14px}
+html[data-theme=pixel] .board .li:nth-child(2n),html[data-theme=pixel] .fboard .li:nth-child(2n){--fill:var(--win-2)}
+html[data-theme=pixel] .board .li .nm,html[data-theme=pixel] .fboard .li .nm{font-family:var(--f-display);font-size:.75rem;line-height:1.6;text-transform:uppercase;letter-spacing:0;text-shadow:2px 2px 0 var(--px-ink);color:var(--px-white)}
+html[data-theme=pixel] .board .li .nm small{text-shadow:none}
+html[data-theme=pixel] .li.lead{--fill:var(--gold)}
+html[data-theme=pixel] .li.lead .nm,html[data-theme=pixel] .li.lead .rank,html[data-theme=pixel] .li.lead .plus,html[data-theme=pixel] .li.lead .nm small{color:var(--px-ink);text-shadow:none}
+html[data-theme=pixel] .li.lead .nm::before{content:"★ "}
+html[data-theme=pixel] .rank{font-family:var(--f-display);font-size:.8rem;color:var(--px-cyan)}
+html[data-theme=pixel] .plus{font-family:var(--f-display);font-size:.7rem;color:var(--px-green);text-shadow:2px 2px 0 var(--px-ink)}
+html[data-theme=pixel] .plus.zero{color:#5a6499}
+html[data-theme=pixel] .plus.neg{color:var(--px-red)}
+html[data-theme=pixel] .chip{font-family:var(--f-display);font-size:.75rem;transform:none;border:0;background:var(--gold);color:var(--px-ink);min-width:42px;height:42px;clip-path:polygon(0 8px,4px 8px,4px 4px,8px 4px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 4px,calc(100% - 4px) 4px,calc(100% - 4px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 4px) calc(100% - 8px),calc(100% - 4px) calc(100% - 4px),calc(100% - 8px) calc(100% - 4px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 4px),4px calc(100% - 4px),4px calc(100% - 8px),0 calc(100% - 8px));box-shadow:inset -4px -4px 0 var(--coin-dark),inset 4px 4px 0 #fff3a8}
+html[data-theme=pixel] .li.lead .chip{background:var(--px-white);color:var(--px-ink)}
+html[data-theme=pixel] .au{color:var(--px-pink)}
+html[data-theme=pixel] .winner h1{font-size:1.4rem;line-height:1.5}
+html[data-theme=pixel] .winner h1 span{color:var(--gold)}
+html[data-theme=pixel] #flash{background:var(--px-ink)}
+html[data-theme=pixel] #flash .ransom{font-size:clamp(2.6rem,13vw,5rem)}
+html[data-theme=pixel] .flash-sub{font-family:var(--f-display);font-size:clamp(.7rem,3.4vw,1rem);line-height:1.6;color:var(--gold);transform:none;animation:pxblink 1s steps(2) infinite}
+html[data-theme=pixel] .flash-note{color:var(--px-white)}
+html[data-theme=pixel] .flash-in{animation:none}
+/* THEMES:END */
+</style>
+
+<div class="wrap">
+  <div id="main"></div>
+</div>
+<div id="flash" hidden></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+const ROUNDS = 8, HALF = ROUNDS / 2;
+const MAX_STORIES = 5, MAX_LEN = 600;
+const TOPICS = [
+  "The worst date you've ever been on","A time you got caught doing something you shouldn't","Your most embarrassing moment at school",
+  "The strangest job you've ever had","A time you got completely lost","The weirdest thing you've ever eaten",
+  "A lie you told as a kid that got out of hand","A vacation that went wrong","A time you met someone famous",
+  "Something you broke and never admitted to","Your worst haircut","A time you laughed at the wrong moment",
+  "The most trouble you got into as a teenager","A time you were mistaken for someone else","Your worst cooking disaster",
+  "A night out that took an unexpected turn","The strangest thing that happened to you on public transport","A time an animal ruined your day",
+  "Your most awkward first impression","A gift that went badly","A time you were way too confident",
+  "The pettiest thing you've ever done","A time technology betrayed you","Your most memorable injury",
+  "The worst concert or show you've been to","A time you got kicked out of somewhere"
+];
+const randTopic = () => TOPICS[Math.floor(Math.random()*TOPICS.length)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+const mult = r => r > HALF ? 2 : 1;
+// Cut-out letters: each one from a different paper, typeface, size and angle. Words never split.
+const ransom = text => { let i = 0; return `<span class="ransom" role="img" aria-label="${esc(text)}">${String(text).split(/\s+/).filter(Boolean).map(w =>
+  `<span class="rw">${[...w].map(c => { const k = i++; return `<span class="rn r${(k*5 + 1) % 8} c${(k*7) % 4} s${(k*2) % 3} t${(k*3) % 5}" aria-hidden="true">${esc(c)}</span>`; }).join("")}</span>`).join("")}</span>`; };
+// Typewriter text: vowels land slightly off the line.
+// Each word is held together so lines only ever break between words.
+const tw = text => { let i = 0; return String(text ?? "").split(/(\s+)/).map(part => {
+  if (!part || /^\s+$/.test(part)){ i += part.length; return esc(part); }
+  let w = ""; for (const c of part){ w += /[aeiou]/i.test(c) ? `<span class="v v${(i*7 + c.charCodeAt(0)) % 5}">${esc(c)}</span>` : esc(c); i++; }
+  return `<span class="w">${w}</span>`;
+}).join(""); };
+
+// Points for one round. A wrong guess earns the author a trick; a missing guess earns nothing.
+function scoreRound(players, author, picks, m){
+  const gained = Object.fromEntries(players.map(p => [p, 0]));
+  for (const p of players){
+    if (p === author || !picks[p]) continue;
+    if (picks[p] === author) gained[p] += 2*m; else if (author in gained) gained[author] += m;
+  }
+  return gained;
+}
+const maxWager = (g, p) => Math.max(1, g.scores[p] || 0);
+function leaders(g){
+  const top = Math.max(...g.players.map(p => g.scores[p] || 0));
+  return { top, winners: g.players.filter(p => (g.scores[p] || 0) === top) };
+}
+
+const S = {
+  status: "connecting", db: null, me: null, priv: false, isHost: false, lead: false,
+  game: null, seatsA: [], seatsB: [], seats: [], sel: null, wager: null, busy: false, deck: null, revealing: null, revealFailed: false,
+  confirm: null, settings: false, peek: null, draft: { game: null, name: "", stories: ["","",""] },
+  setup: { count: 5, topic: randTopic(), hostPlays: true }
+};
+const G = () => S.game;
+// Looks: graffiti is the base CSS; the others are scoped theme blocks. Each device picks its own (kept in localStorage).
+const LOOKS = [["graffiti", "Graffiti"], ["pistols", "Sex Pistols"], ["army", "Army"], ["pixel", "8-Bit"]];
+function applyLook(t){
+  if (!LOOKS.some(l => l[0] === t)) t = "graffiti";
+  S.look = t;
+  document.documentElement.dataset.theme = t;
+  store.set("sw_look", t);
+  // The army look also puts its star insignia in the browser tab.
+  let fav = document.getElementById("fav");
+  if (t === "army"){
+    if (!fav){ fav = document.createElement("link"); fav.id = "fav"; fav.rel = "icon"; document.head.appendChild(fav); }
+    fav.href = "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="14" fill="#4b5320"/><circle cx="50" cy="50" r="41" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="44.5 7" transform="rotate(-13.1 50 50)"/><polygon fill="#fff" points="50,21 57.2,42.1 79.5,42.4 61.6,55.8 68.2,77.1 50,64.2 31.8,77.1 38.4,55.8 20.5,42.4 42.8,42.1"/></svg>`);
+  } else if (fav) fav.remove();
+}
+applyLook(store.get("sw_look", "graffiti"));
+const storyPath = (pid, priv) => (priv ? "stories/" : "openstories/") + pid;
+const seatPath = (pid, priv) => (priv ? "seats/" : "openseats/") + pid;
+const seatsFor = g => S.seats.filter(s => s.game === g.id).sort((a,b) => (a.joinedAt||0) - (b.joinedAt||0));
+const seatOf = pid => S.seats.find(s => s.pid === pid);
+const mySeat = () => { const g = G(); return g && S.seats.find(s => s.pid === S.me && s.game === g.id); };
+const playing = () => { const g = G(); return !!g && (g.players||[]).includes(S.me); };
+const nameOf = pid => (G()?.names||{})[pid] || "Someone";
+const saveDraft = () => store.set("sw_draft:" + S.me, S.draft);
+const youTag = p => p === S.me ? ` <span class="you">you</span>` : "";
+// Who is guessing right now: everyone in a normal round, only the tied players in a tie breaker.
+const guessers = g => g.phase === "tiebreak" || g.phase === "tiereveal" ? (g.tied || []) : (g.players || []);
+
+/* ---------- bindings for inputs (values are never baked into markup, so typing never repaints) ---------- */
+function getBind(k){
+  if (k === "name") return S.draft.name;
+  if (k === "topic") return S.setup.topic;
+  if (k.startsWith("story:")) return S.draft.stories[+k.slice(6)] ?? "";
+  return "";
+}
+function setBind(k, v){
+  if (k === "name") S.draft.name = v;
+  else if (k === "topic") S.setup.topic = v;
+  else if (k.startsWith("story:")) S.draft.stories[+k.slice(6)] = v;
+  saveDraft();
+}
+function paint(el, html){
+  if (el._h === html) return;
+  const f = document.activeElement, fid = f && el.contains(f) ? f.id : null;
+  const ss = fid ? f.selectionStart : null, se = fid ? f.selectionEnd : null;
+  el.innerHTML = html; el._h = html;
+  el.querySelectorAll("[data-bind]").forEach(i => { i.value = getBind(i.dataset.bind); });
+  if (fid){ const n = document.getElementById(fid); if (n){ n.focus({preventScroll:true}); try { n.setSelectionRange(ss, se); } catch {} } }
+}
+
+let toastT;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 4200);
+}
+
+/* ---------- full-screen title pages, played in sequence ---------- */
+let flashQ = [], flashT;
+function flash(items){ flashQ = items.slice(); nextFlash(); }
+function nextFlash(){
+  const f = document.getElementById("flash");
+  clearTimeout(flashT);
+  const it = flashQ.shift();
+  if (!it){ f.hidden = true; return; }
+  f.innerHTML = `<div class="flash-in ${it.cls || ""}">${it.html}</div>`;
+  f.hidden = false;
+  flashT = setTimeout(nextFlash, it.ms);
+}
+const roundCard = n => ({ ms: 2200, html: `${ransom("ROUND " + n)}${n === ROUNDS ? `<p class="flash-sub">Final round</p>` : ""}` });
+function standingsHTML(g){
+  const rows = [...g.players].sort((a, b) => (g.scores[b]||0) - (g.scores[a]||0));
+  let prev = null, rank = 0;
+  return `<div class="fboard list">${rows.map((p, i) => { const sc = g.scores[p] || 0; if (sc !== prev){ rank = i + 1; prev = sc; }
+    return `<div class="g li${rank === 1 ? " lead" : ""}"><span class="rank">${rank}</span><span class="nm">${esc(nameOf(p))}${youTag(p)}</span><span class="chip">${sc}</span></div>`; }).join("")}</div>`;
+}
+const doubleCard = g => ({ ms: 5500, html: `${ransom("DOUBLE POINTS")}<p class="flash-sub">+4 for each story you get right, +2 for each person you trick</p>${standingsHTML(g)}` });
+const tieCard = g => ({ ms: 4000, html: `${ransom("TIE BREAKER")}<p class="flash-sub">${(g.tied || []).map(p => esc(nameOf(p))).join(" vs ")}</p><p class="flash-note">${tw("Wager your points on one more story.")}</p>` });
+function winnerCard(g){
+  const { top, winners } = leaders(g);
+  return { ms: 6500, cls: "win", html: winners.length === 1
+    ? `${ransom(nameOf(winners[0]).toUpperCase())}<p class="flash-sub">wins Story Warz · ${top} points</p>`
+    : `${ransom("TIE")}<p class="flash-sub">${winners.map(p => esc(nameOf(p))).join(" & ")} share the win · ${top} points</p>` };
+}
+
+function errMsg(e){
+  if (e && e.code === "invalid_argument") return "That save was refused. Ask the host to share this game with you as an Editor.";
+  if (e && (e.code === "unavailable" || e.code === "resource_exhausted")) return "Connection hiccup. Try again in a moment.";
+  if (e && e.code === "quota_exceeded") return "The game's storage is full. Ask the host to start a new game.";
+  return (e && e.message) || "Something went wrong. Try again.";
+}
+async function act(fn){
+  if (S.busy) return;
+  S.busy = true; render();
+  try { await fn(); } catch (e) { toast(errMsg(e)); }
+  finally { S.busy = false; render(); }
+}
+
+/* ---------- host actions ---------- */
+// Move the game on only if it is still where this device thinks it is,
+// so a second host device or a stale tab can never rewind it or score a round twice.
+async function transition(from, patch){
+  const snap = await S.db.doc("game/state").get();
+  const cur = snap.exists ? snap.data() : null;
+  if (!cur || cur.id !== from.id || cur.phase !== from.phase || cur.round !== from.round) return false;
+  await S.db.doc("game/state").set({ ...cur, ...patch });
+  return true;
+}
+// One host device at a time runs the automatic reveal. The lease renews every few seconds.
+const TAB = Math.random().toString(36).slice(2, 10);
+async function holdLead(){
+  if (!S.isHost) return;
+  let lead;
+  try { lead = (await S.db.doc("game/lead").acquire({ holder: TAB, ttlMs: 12000 })).acquired; }
+  catch (e) { lead = !(e && (e.code === "unavailable" || e.code === "resource_exhausted")) ? true : S.lead; }
+  if (lead !== S.lead){ S.lead = lead; onChange(); }
+}
+
+async function openLobby(){
+  const { count, hostPlays } = S.setup;
+  const topic = S.setup.topic.trim().slice(0, 120) || randTopic();
+  const id = "g" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  S.settings = false;
+  await S.db.doc("game/state").set({ id, phase: "lobby", count, topic, hostPlays, round: 0, players: [], names: {}, scores: {}, tied: [], story: "", reveal: null });
+}
+
+async function startGame(){
+  const g = G();
+  const seats = seatsFor(g).slice(0, g.count);
+  if (seats.length < g.count || !seats.every(s => s.ready)) throw new Error("Wait until every seat is ready.");
+  const pool = [];
+  for (const s of seats){
+    const d = await S.db.doc(storyPath(s.pid, s.priv)).get();
+    const v = d.exists ? d.data() : null;
+    if (!v || v.game !== g.id) throw new Error(`Couldn't read ${s.name}'s stories. Ask them to tap Edit, then Ready for War again.`);
+    // Cap what any one player can put in the pool, whatever their device sent.
+    const items = (Array.isArray(v.items) ? v.items : []).map(t => String(t).trim().slice(0, MAX_LEN)).filter(Boolean).slice(0, MAX_STORIES);
+    for (const t of items) pool.push({ a: s.pid, t });
+  }
+  if (pool.length < ROUNDS) throw new Error(`Need at least ${ROUNDS} stories in the pool. There are ${pool.length}.`);
+  for (let i = pool.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  // The first 8 are the game; the rest stay hidden for tie breakers.
+  const doc = { game: g.id, deck: pool.slice(0, ROUNDS), rest: pool.slice(ROUNDS), bonus: [] };
+  await S.db.doc("secret/deck").set(doc);
+  S.deck = doc;
+  const players = seats.map(s => s.pid);
+  await transition(g, { phase: "guess", round: 1, players, names: Object.fromEntries(seats.map(s => [s.pid, String(s.name).slice(0, 24)])),
+    scores: Object.fromEntries(players.map(p => [p, 0])), tied: [], story: doc.deck[0].t, reveal: null });
+}
+
+async function getDeck(force){
+  const g = G();
+  if (!force && S.deck && S.deck.game === g.id) return S.deck;
+  const d = await S.db.doc("secret/deck").get();
+  const v = d.exists ? d.data() : null;
+  if (!v || v.game !== g.id) throw new Error("The story deck for this game is missing. Start a new game.");
+  S.deck = v; return v;
+}
+async function authorOf(g){
+  const d = await getDeck();
+  if (g.phase === "tiebreak" || g.phase === "tiereveal"){
+    const b = (d.bonus || []).find(x => x.round === g.round) || (await getDeck(true)).bonus.find(x => x.round === g.round);
+    return b.a;
+  }
+  return d.deck[g.round - 1].a;
+}
+// Each guesser's pick (and wager) is on their own seat; read them all fresh.
+async function freshSeats(){
+  const fresh = {};
+  for (const coll of ["seats", "openseats"]) (await S.db.collection(coll).get()).docs.forEach(d => { fresh[d.id] = d.data(); });
+  return fresh;
+}
+const validPick = (g, p, s) => { const v = s && s.game === g.id && s.lockedRound === g.round ? s.pick : null; return v && g.players.includes(v) && v !== p ? v : null; };
+
+async function doReveal(){
+  const g = G();
+  if (g.phase === "tiebreak") return doTieReveal();
+  const author = await authorOf(g);
+  const fresh = await freshSeats();
+  const picks = Object.fromEntries(g.players.map(p => [p, validPick(g, p, fresh[p])]));
+  const m = mult(g.round);
+  const gained = scoreRound(g.players, author, picks, m);
+  const scores = { ...g.scores };
+  for (const p in gained) scores[p] = (scores[p] || 0) + gained[p];
+  await transition(g, { phase: "reveal", reveal: { author, picks, gained, m }, scores });
+}
+
+// Tie breaker: right guess wins the wager, wrong guess loses it.
+async function doTieReveal(){
+  const g = G();
+  const author = await authorOf(g);
+  const fresh = await freshSeats();
+  const picks = {}, wagers = {}, gained = {};
+  for (const p of g.tied){
+    const s = fresh[p];
+    picks[p] = validPick(g, p, s);
+    wagers[p] = Math.min(Math.max(1, Math.floor(Number(s && s.wager) || 1)), maxWager(g, p));
+    gained[p] = !picks[p] ? 0 : picks[p] === author ? wagers[p] : -wagers[p];
+  }
+  const scores = { ...g.scores };
+  for (const p in gained) scores[p] = (scores[p] || 0) + gained[p];
+  await transition(g, { phase: "tiereveal", reveal: { author, picks, wagers, gained, tie: true }, scores });
+}
+
+// After round 8 (or a tie breaker): crown the winner, or set up a tie breaker
+// with a hidden story from one of the players who are not tied.
+async function finishOrTiebreak(){
+  const g = G();
+  const { winners } = leaders(g);
+  if (winners.length < 2) return transition(g, { phase: "final" });
+  const d = await getDeck(true);
+  const used = new Set((d.bonus || []).map(b => b.t));
+  const losers = g.players.filter(p => !winners.includes(p));
+  const pool = (d.rest || []).filter(x => losers.includes(x.a) && !used.has(x.t));
+  if (!pool.length) return transition(g, { phase: "final" });   // nothing left to play: they share the win
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const round = g.round + 1;
+  const doc = { ...d, bonus: [...(d.bonus || []), { ...pick, round }] };
+  await S.db.doc("secret/deck").set(doc);
+  S.deck = doc;
+  await transition(g, { phase: "tiebreak", round, tied: winners, story: pick.t, reveal: null });
+}
+
+async function nextRound(){
+  const g = G();
+  if (g.phase === "tiereveal" || g.round >= ROUNDS) return finishOrTiebreak();
+  const n = g.round + 1;
+  const d = await getDeck();
+  await transition(g, { phase: "guess", round: n, story: d.deck[n-1].t, reveal: null });
+}
+
+async function peekAuthor(){
+  const g = G();
+  S.peek = { key: g.id + ":" + g.round, author: await authorOf(g) };
+}
+
+// The host reveals by hand once every guesser has locked in.
+function allLocked(g){
+  const who = guessers(g);
+  return who.length > 0 && who.every(p => { const s = seatOf(p); return s && s.game === g.id && s.lockedRound === g.round; });
+}
+
+/* ---------- player actions ---------- */
+async function joinReady(){
+  const g = G();
+  const name = S.draft.name.trim().slice(0, 24);
+  const items = S.draft.stories.map(s => s.trim().slice(0, MAX_LEN)).filter(Boolean).slice(0, MAX_STORIES);
+  if (!name) throw new Error("Enter your name first.");
+  if (items.length < 3) throw new Error("Write at least 3 stories.");
+  if (seatsFor(g).some(s => s.pid !== S.me && String(s.name).toLowerCase() === name.toLowerCase())) throw new Error("Someone already has that name. Add an initial.");
+  await S.db.doc(storyPath(S.me, S.priv)).set({ game: g.id, topic: g.topic, items });
+  const prev = mySeat();
+  await S.db.doc(seatPath(S.me, S.priv)).set({ game: g.id, name, ready: true, priv: S.priv, joinedAt: prev?.joinedAt || Date.now(), lockedRound: 0 });
+}
+
+async function lockIn(){
+  const g = G(), pick = S.sel;
+  if (!pick || pick === S.me) return;
+  const me = mySeat();
+  const patch = { lockedRound: g.round, pick };
+  if (g.phase === "tiebreak") patch.wager = S.wager;
+  await S.db.doc(seatPath(S.me, me ? me.priv : S.priv)).update(patch);
+}
+
+/* ---------- rendering ---------- */
+const rulesHTML = () => `<p class="rules"><b>+2</b> for each story you get right, <b>+1</b> for each person you trick</p>`;
+function heroHTML(line){
+  return `<section class="hero">${ransom("STORY WARZ")}<p class="tag-line">${tw(line)}</p></section>`;
+}
+function topHTML(){
+  const g = G();
+  const inGame = g && ["guess","reveal","tiebreak","tiereveal","final"].includes(g.phase);
+  let pills = "";
+  if (g && (g.phase === "guess" || g.phase === "reveal")) pills += `<span class="pill">Rnd ${g.round}/${ROUNDS}</span>`;
+  if (g && (g.phase === "tiebreak" || g.phase === "tiereveal")) pills += `<span class="pill hot">Tie breaker</span>`;
+  if (S.isHost && !(g && g.phase)) pills += `<span class="pill">Host</span>`;
+  pills += `<button class="g btn sm" data-act="settings" aria-expanded="${S.settings}">${S.settings ? "Close" : "Settings"}</button>`;
+  let pips = "";
+  if (inGame){
+    const cur = g.phase === "guess" || g.phase === "reveal" ? g.round : ROUNDS + 1;
+    // Rounds 5-8 only turn red once the double points page has been shown.
+    const dblShown = cur > HALF;
+    pips = `<div class="pips" aria-label="Round ${Math.min(cur, ROUNDS)} of ${ROUNDS}">${Array.from({length: ROUNDS}, (_, i) => {
+      const r = i + 1, cls = ["pip", r > HALF && dblShown ? "dbl" : "", r < cur || (r === cur && g.phase === "reveal") ? "done" : "", r === cur && g.phase === "guess" ? "now" : ""].join(" ");
+      return `<span class="${cls}"></span>`;
+    }).join("")}</div>`;
+  }
+  const brand = (!g || !g.phase) ? "" : ransom("STORY WARZ");
+  return `<header class="top">${brand}<div class="pills">${pills}</div></header>${pips}`;
+}
+
+function settingsHTML(g){
+  if (!S.settings) return "";
+  const look = `<div class="field"><span class="lbl" id="lookLbl">Look</span>
+    <div class="seg looks" role="group" aria-labelledby="lookLbl">${LOOKS.map(([id, label]) => `<button class="g" data-act="look" data-v="${id}" aria-pressed="${S.look === id}">${label}</button>`).join("")}</div>
+    <p class="fine">Only changes the look on this device.</p></div>`
+    + (S.isHost && window.claudeLocalHostLink ? `<div class="field"><span class="lbl">Host from your phone</span>
+    <p class="fine">Open this link on your phone (same Wi-Fi) to run the game from there. Keep it private: it gives host powers.</p>
+    <input type="text" readonly value="${esc(window.claudeLocalHostLink)}" onclick="this.select()" aria-label="Host link for your phone"></div>` : "")
+    + (S.isHost && window.claudeLocalInvite ? `<div class="field"><span class="lbl">Invite players</span>${inviteHTML()}</div>` : "");
+  if (!S.isHost || !g || !g.phase) return `<section class="card settings"><p class="eyebrow">${S.isHost ? "Host settings" : "Settings"}</p>${look}</section>`;
+  const key = g.id + ":" + g.round;
+  let peek = "";
+  if (g.phase === "guess" || g.phase === "tiebreak"){
+    peek = S.peek && S.peek.key === key
+      ? `<div class="peek"><p class="fine">This story was written by</p><strong>${esc(nameOf(S.peek.author))}</strong></div><div class="btns"><button class="g btn" data-act="unpeek">Hide author</button></div>`
+      : `<div class="btns"><button class="g btn" data-act="peek">Show author</button></div><p class="fine">Only shows on this screen. Players never see it before the reveal.</p>`;
+    if (S.revealFailed) peek += `<div class="btns"><button class="g btn" data-act="retryReveal">Retry reveal</button></div>`;
+  }
+  const other = S.lead ? "" : `<p class="fine">The game is also open as host on another of your devices. That one reveals rounds automatically.</p>`;
+  return `<section class="card settings"><p class="eyebrow">Host settings</p>${look}${other}${peek}
+    ${g.phase !== "final" ? confirmHTML(g.phase === "lobby" ? "cancel" : "end", g.phase === "lobby" ? "Cancel this lobby" : "End this game", "End it now and go back to setup?") : ""}</section>`;
+}
+
+function setupHTML(title){
+  const s = S.setup;
+  return `<section class="card">
+    <p class="eyebrow">Host setup</p>
+    <h1>${esc(title)}</h1>
+    <div class="field"><span class="lbl" id="countLbl">Number of players</span>
+      <div class="seg" role="group" aria-labelledby="countLbl">${[3,4,5].map(n => `<button class="g" data-act="count" data-v="${n}" aria-pressed="${s.count === n}">${n}</button>`).join("")}</div></div>
+    <div class="field"><label for="topic">Topic</label>
+      <div class="row"><input type="text" id="topic" data-bind="topic" maxlength="120"><button class="g btn" data-act="rtopic">Shuffle</button></div>
+      <p class="fine">A random topic is picked for you. Type your own to replace it.</p></div>
+    <label class="check"><input type="checkbox" id="hostPlays" data-act="hostPlays" ${s.hostPlays ? "checked" : ""}> I'm playing too</label>
+    <button class="g primary" data-act="open" ${S.busy ? "disabled" : ""}>Open the lobby</button>
+    ${rulesHTML()}
+  </section>`;
+}
+
+function joinHTML(g){
+  if (S.draft.game !== g.id){ S.draft.game = g.id; S.draft.stories = ["","",""]; saveDraft(); }
+  const n = S.draft.stories.length;
+  return `<section class="card">
+    <p class="eyebrow">Your seat</p>
+    <div class="field"><label for="pname">Your name</label><input type="text" id="pname" data-bind="name" maxlength="24" autocomplete="nickname"></div>
+    ${S.draft.stories.map((_, i) => `<div class="story-in">
+      <div class="lab"><label for="st${i}">Story ${i+1}${i >= 3 ? " (optional)" : ""}</label>${i >= 3 ? `<button class="link" data-act="rmstory" data-v="${i}">Remove</button>` : ""}</div>
+      <textarea id="st${i}" data-bind="story:${i}" rows="4" maxlength="${MAX_LEN}" placeholder="Tell it in a few sentences. Leave out anything that gives you away."></textarea></div>`).join("")}
+    ${n < MAX_STORIES ? `<div class="btns"><button class="g btn" data-act="addstory">+ Another story (${n}/${MAX_STORIES})</button></div>` : ""}
+    <button class="g primary" data-act="ready" ${S.busy ? "disabled" : ""}>Ready for War</button>
+    <p class="fine">Write 3 to 5 stories. Nobody sees them until one is drawn, and the author stays hidden until everyone guesses.</p>
+  </section>`;
+}
+
+function seatListHTML(g){
+  const seats = seatsFor(g);
+  const rows = [];
+  const kick = s => S.isHost && s.pid !== S.me ? `<button class="x" data-act="kick" data-v="${esc(s.pid)}" aria-label="Remove ${esc(s.name)}">×</button>` : "";
+  for (let i = 0; i < g.count; i++){
+    const s = seats[i];
+    if (!s){ rows.push(`<div class="li empty"><span class="nm">${tw("open seat…")}</span></div>`); continue; }
+    rows.push(`<div class="li"><span class="nm">${esc(s.name)}${youTag(s.pid)}</span><span class="tag ${s.ready ? "ok" : ""}">${s.ready ? "Ready" : "Writing"}</span>${kick(s)}</div>`);
+  }
+  for (const s of seats.slice(g.count)) rows.push(`<div class="li"><span class="nm">${esc(s.name)}<small>waiting list</small></span>${kick(s)}</div>`);
+  const ready = seats.slice(0, g.count).filter(s => s.ready).length;
+  return `<section><p class="eyebrow">The crew · ${ready} of ${g.count} ready</p><div class="list">${rows.join("")}</div></section>`;
+}
+
+// The players' link as a QR code. Only the local server and the phone app have one.
+function inviteHTML(){
+  const link = window.claudeLocalInvite;
+  if (!S.isHost || !link) return "";
+  const qr = window.claudeLocalInviteQr;
+  return `<div class="invite">${qr ? `<img src="${esc(qr.startsWith("data:") ? qr : qr + "?l=" + encodeURIComponent(link))}" alt="QR code for the player link">` : ""}
+    <p class="fine">${qr ? "Players scan this code" : "Players open this link"}${window.claudeRoom ? "" : " on the same Wi-Fi"}:<br><b>${esc(link)}</b></p></div>`;
+}
+
+function lobbyHTML(g){
+  let out = `<section class="topic"><p class="eyebrow">This game's topic</p><h1><span>${esc(g.topic)}</span></h1>
+    <p>${tw("Everyone writes 3–5 true stories on this topic. Each round one gets drawn at random. Guess who wrote it.")}</p></section>`;
+  if (S.isHost){
+    const seats = seatsFor(g).slice(0, g.count);
+    const left = g.count - seats.filter(s => s.ready).length;
+    out += `<section class="card"><p class="eyebrow">Host controls</p>
+      <p>${left === 0 ? "Everyone is ready." : `Waiting for ${left} more player${left === 1 ? "" : "s"} to be ready.`}</p>
+      ${left > 0 ? inviteHTML() : ""}
+      <button class="g primary" data-act="start" ${left === 0 && !S.busy ? "" : "disabled"}>Start the war</button></section>`;
+  }
+  if (!S.isHost || g.hostPlays){
+    const mine = mySeat();
+    const seats = seatsFor(g);
+    if (mine && mine.ready){
+      out += `<section class="card"><p class="eyebrow">You're in</p><h2>Seated as ${esc(mine.name)}</h2>
+        <p class="fine">Your stories are in the pool. ${S.isHost ? "Start the game once every seat is ready." : "The host starts the game once every seat is ready."}</p>
+        <div class="btns"><button class="g btn" data-act="unready">Edit my stories</button><button class="g btn danger" data-act="leave">Leave seat</button></div></section>`;
+    } else if (!mine && seats.length >= g.count){
+      out += `<div class="notice">${tw("This game is full. Ask the host to free a seat.")}</div>`;
+    } else {
+      out += joinHTML(g);
+    }
+  }
+  return out + seatListHTML(g);
+}
+
+function storyCardHTML(g, revealed){
+  const tb = g.phase === "tiebreak" || g.phase === "tiereveal";
+  return `<section class="storycard" aria-label="${tb ? "Tie breaker story" : `Story for round ${g.round}`}">
+    <div class="hd"><span>Anonymous</span><span>${tb ? "Tie breaker" : `Round ${g.round} / ${ROUNDS}`}</span></div>
+    <p class="typed">${tw(g.story)}</p>
+    ${revealed ? `<div class="stamp">Written by ${esc(nameOf(g.reveal.author))}</div>` : ""}
+  </section>`;
+}
+
+function wagerHTML(g){
+  const max = maxWager(g, S.me);
+  if (S.wager == null) S.wager = Math.max(1, Math.floor(max / 2));
+  S.wager = Math.min(Math.max(1, S.wager), max);
+  return `<div class="field"><span class="lbl">Your wager</span>
+    <div class="wager"><button class="g btn" data-act="wager" data-v="-1" aria-label="Wager less" ${S.wager <= 1 ? "disabled" : ""}>−</button>
+    <span class="amt">${S.wager}</span>
+    <button class="g btn" data-act="wager" data-v="1" aria-label="Wager more" ${S.wager >= max ? "disabled" : ""}>+</button>
+    <button class="g btn" data-act="wager" data-v="all">All in</button></div>
+    <p class="fine">Guess right and win it. Guess wrong and lose it.</p></div>`;
+}
+
+// One screen for normal rounds and tie breakers: the names as a list of tiles,
+// with each locked-in pick shown on the name it went to, for everyone to see.
+function pickScreenHTML(g){
+  const tb = g.phase === "tiebreak";
+  const who = guessers(g);
+  const pickOf = p => { const s = seatOf(p); return who.includes(p) && s && s.game === g.id && s.lockedRound === g.round ? s.pick : null; };
+  const pickers = target => who.filter(p => pickOf(p) === target);
+  const tags = target => { const v = pickers(target); return v.length ? `<span class="voters">${v.map(p => `<span class="vt">${esc(nameOf(p))}${p === S.me ? " (you)" : ""}</span>`).join("")}</span>` : ""; };
+  const waiting = who.filter(p => !pickOf(p));
+  const mine = pickOf(S.me);
+  let body;
+  if (who.includes(S.me)){
+    const self = `<div class="g opt ro self" aria-disabled="true" title="You can't pick yourself"><span class="tn">${esc(nameOf(S.me))}</span><span class="yp">You · can't pick</span>${tags(S.me)}</div>`;
+    const row = p => p === S.me ? self : null;
+    if (mine){
+      body = `<p class="eyebrow">You locked in ${esc(nameOf(mine))}${tb ? ` · wager ${esc(mySeat()?.wager)}` : ""}</p>
+        <div class="quad">${g.players.map(p => row(p) || `<div class="g opt ro${p === mine ? " mine" : ""}"><span class="tn">${esc(nameOf(p))}</span>${p === mine ? `<span class="yp">Your pick</span>` : ""}${tags(p)}</div>`).join("")}</div>`;
+    } else {
+      body = (tb ? wagerHTML(g) : "") + `<p class="eyebrow">Who wrote it?</p>
+        <div class="quad">${g.players.map(p => row(p) || `<button class="g opt" data-act="sel" data-v="${esc(p)}" aria-pressed="${S.sel === p}"><span class="tn">${esc(nameOf(p))}</span>${tags(p)}</button>`).join("")}</div>
+        <button class="g primary" data-act="lock" ${S.sel && !S.busy ? "" : "disabled"}>${S.sel ? `Lock in ${esc(nameOf(S.sel))}${tb ? ` for ${S.wager}` : ""}` : "Pick a name"}</button>
+        ${tb ? "" : `<p class="fine">Wrote this one yourself? Pick someone else and keep a straight face.</p>`}`;
+    }
+  } else {
+    body = `<p class="eyebrow">${tb ? `Tie breaker: ${who.map(p => esc(nameOf(p))).join(" vs ")}` : "Picks so far"}</p>
+      <div class="quad">${g.players.map(p => `<div class="g opt ro"><span class="tn">${esc(nameOf(p))}</span>${tags(p)}</div>`).join("")}</div>`;
+  }
+  if (waiting.length) body += `<p class="fine">Still choosing: ${waiting.map(p => esc(nameOf(p))).join(", ")}</p>`;
+  else if (S.isHost) body += `<p class="fine">Everyone's locked in.</p><button class="g primary" data-act="reveal" ${S.busy ? "disabled" : ""}>Reveal the author</button>`;
+  else body += `<p class="fine">Everyone's locked in. Waiting for the host to reveal.</p>`;
+  return storyCardHTML(g, false) + `<section class="card">${body}</section>`;
+}
+
+// The one scoreboard: shown only between rounds and at the end. With a round's results it adds
+// what each player did and the points they just scored (red), then their running total.
+function boardHTML(g, title, r){
+  const rows = [...g.players].sort((a, b) => (g.scores[b]||0) - (g.scores[a]||0));
+  const fooled = r && !r.tie ? g.players.filter(p => p !== r.author && r.picks[p] && r.picks[p] !== r.author).length : 0;
+  let prev = null, rank = 0;
+  return `<section class="card board"><p class="eyebrow">${title}</p><div class="list">${rows.map((p, i) => {
+    const sc = g.scores[p] || 0; if (sc !== prev){ rank = i + 1; prev = sc; }
+    let what = "", gain = "";
+    if (r && (!r.tie || p in r.gained)){
+      const gn = r.gained[p] || 0;
+      gain = gn < 0 ? `<span class="plus neg">−${-gn}</span>` : `<span class="plus ${gn ? "" : "zero"}">+${gn}</span>`;
+      const guess = !r.picks[p] ? "didn't guess" : `guessed ${esc(nameOf(r.picks[p]))} · ${r.picks[p] === r.author ? "right" : r.tie ? "wrong" : "fooled"}`;
+      if (r.tie) what = `wagered ${r.wagers[p]} · ${guess}`;
+      else if (p === r.author) what = `<b class="au">Author</b> · fooled ${fooled}`;
+      else what = guess;
+    }
+    return `<div class="g li${rank === 1 ? " lead" : ""}"><span class="rank">${rank}</span><span class="nm">${esc(nameOf(p))}${youTag(p)}${what ? `<small>${what}</small>` : ""}</span>${gain}<span class="chip">${sc}</span></div>`;
+  }).join("")}</div></section>`;
+}
+
+function revealHTML(g){
+  const r = g.reveal;
+  let label;
+  if (g.phase === "tiereveal") label = leaders(g).winners.length > 1 ? "Another tie breaker" : "Crown the winner";
+  else label = g.round >= ROUNDS ? "See final results" : `Deal round ${g.round + 1}`;
+  return storyCardHTML(g, true) + boardHTML(g, g.phase === "tiereveal" ? "Tie breaker results" : `Round ${g.round} results`, r)
+    + (S.isHost ? `<button class="g primary" data-act="next" ${S.busy ? "disabled" : ""}>${label}</button>`
+                : `<p class="fine">Waiting for the host.</p>`);
+}
+
+function finalHTML(g){
+  const { top, winners } = leaders(g);
+  const head = winners.length === 1 ? `<span>${esc(nameOf(winners[0]))}</span> wins the war` : `Tie: <span>${winners.map(p => esc(nameOf(p))).join(" & ")}</span>`;
+  return `<section class="winner"><p class="eyebrow">Final</p><h1>${head}</h1><span class="chip">${top}</span></section>`
+    + boardHTML(g, "Final standings", null)
+    + (S.isHost ? setupHTML("Run it back") : `<p class="fine">The host can start a new game from here.</p>`);
+}
+
+function confirmHTML(id, label, question){
+  if (S.confirm !== id) return `<div class="btns"><button class="g btn danger" data-act="ask" data-v="${id}">${label}</button></div>`;
+  return `<div class="field"><p class="fine">${question}</p><div class="btns"><button class="g btn danger" data-act="do-${id}">Yes, ${label.toLowerCase()}</button><button class="g btn" data-act="ask" data-v="">Keep going</button></div></div>`;
+}
+
+function render(){
+  const g = G();
+  let body = "";
+  const line = "Tell the truth. Lie with your face.";
+  if (S.status === "connecting") body = heroHTML("Plugging in the amps…");
+  else if (S.status === "nodb") body = heroHTML(line) + `<div class="notice">${tw("This game needs a live connection. Open it from its claude.ai link while signed in. If you just joined, ask the host to share it with you as an Editor.")}</div>`;
+  else if (!g || !g.phase) body = S.isHost ? heroHTML(line) + setupHTML("Start a new game") :
+    heroHTML(line) +
+    `<div class="notice">${tw("Waiting for the host to open a game…")}</div>
+     <section class="card"><p class="eyebrow">Welcome to Story Warz</p><p>${tw("You each submitted random stories, and each round one of those stories will be selected. If it is your story, it is your job to trick everyone else. If it is not your story, it is your job to find out whose story it is.")}</p>${rulesHTML()}</section>`;
+  else if (g.phase === "lobby") body = lobbyHTML(g);
+  else if (g.phase === "guess" || g.phase === "tiebreak") body = pickScreenHTML(g);
+  else if ((g.phase === "reveal" || g.phase === "tiereveal") && g.reveal) body = revealHTML(g);
+  else if (g.phase === "final") body = finalHTML(g);
+  paint(document.getElementById("main"), topHTML() + settingsHTML(g) + body);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("input", e => {
+  const b = e.target.dataset && e.target.dataset.bind;
+  if (b) setBind(b, e.target.value);
+});
+document.getElementById("flash").addEventListener("click", nextFlash);
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const a = el.dataset.act, v = el.dataset.v;
+  const g = G();
+  const me = mySeat();
+  switch (a){
+    case "count": S.setup.count = +v; break;
+    case "rtopic": S.setup.topic = randTopic(); document.getElementById("topic").value = S.setup.topic; return;
+    case "hostPlays": S.setup.hostPlays = el.checked; break;
+    case "open": return act(openLobby);
+    case "addstory": if (S.draft.stories.length < MAX_STORIES){ S.draft.stories.push(""); saveDraft(); } break;
+    case "rmstory": S.draft.stories.splice(+v, 1); saveDraft(); break;
+    case "ready": return act(joinReady);
+    case "unready": return me && act(() => S.db.doc(seatPath(S.me, me.priv)).update({ ready: false }));
+    case "leave": return me && act(() => S.db.doc(seatPath(S.me, me.priv)).delete());
+    case "kick": { const s = seatOf(v); return s && act(() => S.db.doc(seatPath(s.pid, s.priv)).delete()); }
+    case "start": return act(startGame);
+    case "sel": if (v !== S.me) S.sel = v; break;
+    case "look": applyLook(v); render(); return;
+    case "wager": S.wager = v === "all" ? maxWager(g, S.me) : (S.wager || 1) + Number(v); break;
+    case "lock": return act(lockIn);
+    case "next": return act(nextRound);
+    case "settings": S.settings = !S.settings; S.confirm = null; break;
+    case "peek": return act(peekAuthor);
+    case "unpeek": S.peek = null; break;
+    case "ask": S.confirm = v || null; break;
+    case "do-cancel": case "do-end": S.confirm = null; S.settings = false; return act(() => S.db.doc("game/state").set({ phase: null }));
+    case "retryReveal": S.revealFailed = false; return act(doReveal);
+    case "reveal": if (!S.isHost || !g || !allLocked(g)) return; return act(doReveal);
+  }
+  render();
+});
+
+/* ---------- boot ---------- */
+let lastRoundKey = null, gameLoaded = false;
+const roundKey = g => g ? g.id + ":" + g.phase + ":" + g.round : null;
+function onChange(){
+  if (!gameLoaded) return render();
+  const g = G();
+  const rk = roundKey(g);
+  if (rk !== lastRoundKey){
+    if (g && g.phase === "guess") flash(g.round === HALF + 1 ? [doubleCard(g), roundCard(g.round)] : [roundCard(g.round)]);
+    else if (g && g.phase === "tiebreak") flash([tieCard(g)]);
+    else if (g && g.phase === "final") flash([winnerCard(g)]);
+    lastRoundKey = rk; S.sel = null; S.wager = null; S.confirm = null; S.peek = null;
+  }
+  render();
+}
+function localId(){
+  let id = store.get("sw_pid", null);
+  if (!id){ id = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); store.set("sw_pid", id); }
+  return id;
+}
+async function boot(){
+  window.onLocalInvite = render;   // the phone app's Wi-Fi address changed
+  render();
+  if (!window.claude || !window.claude.use){ S.status = "nodb"; return render(); }
+  const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+  if (!db){ S.status = "nodb"; return render(); }
+  S.db = db;
+  const uid = user ? await user.id() : null;
+  S.priv = !!uid;
+  S.me = uid || localId();
+  S.isHost = user ? await user.isOwner() : false;
+  S.draft = store.get("sw_draft:" + S.me, S.draft);
+  S.status = "live";
+  if (S.isHost){ holdLead(); setInterval(holdLead, 4000); }
+  const fail = e => { if (e && e.code === "revoked") S.status = "nodb"; else toast(errMsg(e)); render(); };
+  const seatsIn = (q, which) => { S[which] = q.docs.map(d => ({ ...d.data(), pid: d.id })); S.seats = [...S.seatsA, ...S.seatsB]; onChange(); };
+  db.doc("game/state").onSnapshot(s => {
+    S.game = s.exists ? s.data() : null;
+    // No title page when the page first opens mid-round.
+    if (!gameLoaded){ gameLoaded = true; lastRoundKey = roundKey(S.game); }
+    onChange();
+  }, fail);
+  db.collection("seats").onSnapshot(q => seatsIn(q, "seatsA"), fail);
+  db.collection("openseats").onSnapshot(q => seatsIn(q, "seatsB"), fail);
+}
+boot();
+</script>
+
+</body></html>
