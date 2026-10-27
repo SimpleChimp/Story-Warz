@@ -24,9 +24,11 @@
       const box = document.createElement("div");
       box.id = "sw-landing";
       box.innerHTML = `<style>
-        #sw-landing{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
-          background:#111;color:#f4f1ea;font-family:"Anton",Impact,sans-serif;padding:16px}
-        #sw-landing .w{width:100%;max-width:380px;text-align:center}
+        /* Scrolls, and sits high rather than dead-center, so the phone keyboard never hides the Join button. */
+        #sw-landing{position:fixed;inset:0;z-index:9999;display:flex;justify-content:center;overflow-y:auto;
+          background:#111;color:#f4f1ea;font-family:"Anton",Impact,sans-serif;padding:16px;box-sizing:border-box}
+        #sw-landing .w{width:100%;max-width:380px;text-align:center;margin:6vh auto auto;padding-bottom:40vh}
+        #sw-landing .code{display:flex;flex-direction:column;align-items:center}
         #sw-landing h1{font-family:"Permanent Marker","Anton",sans-serif;font-size:56px;margin:0 0 4px;color:#ff3d7f;
           text-shadow:3px 3px 0 #00e5ff;letter-spacing:1px}
         #sw-landing p{font-family:system-ui,sans-serif;opacity:.8;margin:0 0 24px}
@@ -40,8 +42,8 @@
       </style><div class="w"><h1>Story Warz</h1><p>Guess who wrote the story.</p>
         <button data-a="host">Host a game</button>
         <div class="or">or join with a room code</div>
-        <input maxlength="4" placeholder="ABCD" autocomplete="off" aria-label="Room code">
-        <button class="alt" data-a="join">Join</button>
+        <div class="code"><input maxlength="4" placeholder="ABCD" autocomplete="off" aria-label="Room code">
+        <button class="alt" data-a="join">Join</button></div>
         <p class="msg"></p></div>`;
       document.body.appendChild(box);
       const say = t => { box.querySelector(".msg").textContent = t; };
@@ -62,6 +64,8 @@
         } catch (x) { say(x.message || "Something went wrong."); e.target.disabled = false; }
       });
       input.addEventListener("keydown", e => { if (e.key === "Enter") box.querySelector('[data-a="join"]').click(); });
+      // When the keyboard opens, bring the Join button into view just under the code box.
+      input.addEventListener("focus", () => setTimeout(() => box.querySelector('[data-a="join"]').scrollIntoView({ block: "nearest", behavior: "smooth" }), 350));
     });
   }
   async function createRoom() {
